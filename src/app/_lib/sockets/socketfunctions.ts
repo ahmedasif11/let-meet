@@ -1,8 +1,19 @@
 import socket from './socket';
 import peerConnectionManager from '../peer-connection/peerConnectionManager';
+import localMediaStreamsStore from '../store/localMeidaStreamsStore';
 
 const newUserJoined = async (socketId: string) => {
   const peerConnection = peerConnectionManager.createConnection(socketId);
+  const localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
+
+  localMediaStreams.forEach((stream) => {
+    stream.getTracks().forEach((kind) => {
+      peerConnection.peer?.addTransceiver(kind, {
+        direction: 'sendrecv',
+      });
+      peerConnection.peer?.addTrack(kind, stream);
+    });
+  });
 
   if (peerConnection.getSignalingState() !== 'stable') {
     peerConnection.reset();

@@ -1,4 +1,5 @@
 import socket from '../sockets/socket';
+import remoteStreamsStore from '../store/remoteStreamsStore';
 
 class PeerConnection {
   peer: RTCPeerConnection | null = null;
@@ -24,6 +25,13 @@ class PeerConnection {
           candidate: event.candidate,
           to: this.targetSocketId,
         });
+      }
+    };
+
+    this.peer.ontrack = (event) => {
+      const stream = event.streams[0];
+      if (this.targetSocketId && stream) {
+        remoteStreamsStore.addStream(stream, this.targetSocketId);
       }
     };
   }
