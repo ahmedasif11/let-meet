@@ -21,6 +21,8 @@ class PeerConnection {
 
     this.peer.onicecandidate = (event) => {
       if (event.candidate && this.targetSocketId) {
+        console.log('Ice Candidates: ', event.candidate);
+
         socket.emit('send-ice-candidate', {
           candidate: event.candidate,
           to: this.targetSocketId,
@@ -31,6 +33,13 @@ class PeerConnection {
     this.peer.ontrack = (event) => {
       const stream = event.streams[0];
       if (this.targetSocketId && stream) {
+        console.log(
+          'Adding remote stream:',
+          stream,
+          'for socket ID:',
+          this.targetSocketId
+        );
+
         remoteStreamsStore.addStream(stream, this.targetSocketId);
       }
     };

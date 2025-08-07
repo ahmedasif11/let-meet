@@ -8,7 +8,7 @@ export async function setupMediaStream() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: false,
+      audio: true,
     });
 
     if (!stream) {

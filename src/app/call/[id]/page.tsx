@@ -12,7 +12,6 @@ import {
   receiveOffer,
   receiveAnswer,
   receiveIceCandidate,
-  callConnected,
 } from '@/app/_lib/sockets/socketfunctions';
 import { useParams } from 'next/navigation';
 
@@ -29,7 +28,6 @@ export default function CallPage() {
     socket.on('receive-offer', receiveOffer);
     socket.on('receive-answer', receiveAnswer);
     socket.on('receive-ice-candidate', receiveIceCandidate);
-    socket.on('call-connected', callConnected);
 
     return () => {
       socket.off('join-room', id);
@@ -37,7 +35,6 @@ export default function CallPage() {
       socket.off('receive-offer', receiveOffer);
       socket.off('receive-answer', receiveAnswer);
       socket.off('receive-ice-candidate', receiveIceCandidate);
-      socket.off('call-connected', callConnected);
     };
   }, [id]);
 

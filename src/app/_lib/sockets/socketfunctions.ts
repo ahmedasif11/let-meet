@@ -7,11 +7,12 @@ const newUserJoined = async (socketId: string) => {
   const localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
 
   localMediaStreams.forEach((stream) => {
-    stream.getTracks().forEach((kind) => {
-      peerConnection.peer?.addTransceiver(kind, {
+    stream.getTracks().forEach((track) => {
+      console.log('Adding local stream track:', track);
+      const transceiver = peerConnection.peer?.addTransceiver(track.kind, {
         direction: 'sendrecv',
       });
-      peerConnection.peer?.addTrack(kind, stream);
+      transceiver?.sender.replaceTrack(track);
     });
   });
 
@@ -94,15 +95,4 @@ const receiveIceCandidate = async ({
   }
 };
 
-const callConnected = async ({ from }: { from: any }) => {
-  console.log('Call Connected:', { from });
-  socket.emit('i-am-connected', { to: from });
-};
-
-export {
-  newUserJoined,
-  receiveOffer,
-  receiveAnswer,
-  receiveIceCandidate,
-  callConnected,
-};
+export { newUserJoined, receiveOffer, receiveAnswer, receiveIceCandidate };

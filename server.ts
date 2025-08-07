@@ -76,18 +76,6 @@ app
         });
       });
 
-      socket.on('call-connected', ({ to }: { to: any }) => {
-        connectedPeers[socket.id].isConnected = true;
-        io.to(to).emit('call-connected', { from: socket.id });
-      });
-
-      socket.on('i-am-connected', ({ to }: { to: any }) => {
-        connectedPeers[socket.id].isConnected = true;
-        io.to(to).emit('call-connected', {
-          from: socket.id,
-        });
-      });
-
       socket.on('disconnect', () => {
         console.log('user disconnected:', socket.id);
         delete connectedPeers[socket.id];

@@ -14,6 +14,7 @@ export default function LocalVideo({ className }: { className: string }) {
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
+      console.log('Local media stream setup successfully');
     } catch (error: any) {
       console.error('Failed to setup media:', error.message);
     }
