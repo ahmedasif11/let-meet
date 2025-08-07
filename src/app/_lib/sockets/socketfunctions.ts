@@ -1,6 +1,7 @@
 import socket from './socket';
 import peerConnectionManager from '../peer-connection/peerConnectionManager';
 import localMediaStreamsStore from '../store/localMeidaStreamsStore';
+import { setupMediaStream } from '@/app/_lib/peer-connection/setUpMediaStream';
 
 const newUserJoined = async (socketId: string) => {
   const peerConnection = peerConnectionManager.createConnection(socketId);
@@ -37,6 +38,25 @@ const newUserJoined = async (socketId: string) => {
 
 const receiveOffer = async ({ offer, from }: { offer: any; from: any }) => {
   const peerConnection = peerConnectionManager.createConnection(from);
+
+  let localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
+
+  if (!localMediaStreams || localMediaStreams.length === 0) {
+    const stream = await setupMediaStream();
+    localMediaStreamsStore.setLocalMediaStreams([stream]);
+
+    localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
+  }
+
+  localMediaStreams.forEach((stream) => {
+    console.log('Adding local stream by new joined peer:', stream);
+    stream.getTracks().forEach((track) => {
+      const transceiver = peerConnection.peer?.addTransceiver(track.kind, {
+        direction: 'sendrecv',
+      });
+      transceiver?.sender.replaceTrack(track);
+    });
+  });
 
   if (peerConnection.getSignalingState() !== 'stable') {
     peerConnection.reset();

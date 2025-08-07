@@ -31,15 +31,17 @@ class PeerConnection {
     };
 
     this.peer.ontrack = (event) => {
-      const stream = event.streams[0];
+      let stream = event.streams[0];
+      if (!stream) {
+        stream = new MediaStream([event.track]);
+      }
+      console.log(
+        'Adding remote stream:',
+        stream,
+        'for socket ID:',
+        this.targetSocketId
+      );
       if (this.targetSocketId && stream) {
-        console.log(
-          'Adding remote stream:',
-          stream,
-          'for socket ID:',
-          this.targetSocketId
-        );
-
         remoteStreamsStore.addStream(stream, this.targetSocketId);
       }
     };
@@ -79,7 +81,9 @@ class PeerConnection {
 
   async addIceCandidate(candidate: RTCIceCandidate) {
     if (!this.peer) throw new Error('Peer connection not initialized');
-    await this.peer.addIceCandidate(candidate);
+    if (candidate) {
+      await this.peer.addIceCandidate(candidate);
+    }
   }
 
   async close() {
