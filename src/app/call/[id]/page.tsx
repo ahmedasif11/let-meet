@@ -12,6 +12,7 @@ import {
   receiveOffer,
   receiveAnswer,
   receiveIceCandidate,
+  userDisconnected,
 } from '@/app/_lib/sockets/socketfunctions';
 import { useParams } from 'next/navigation';
 
@@ -28,13 +29,14 @@ export default function CallPage() {
     socket.on('receive-offer', receiveOffer);
     socket.on('receive-answer', receiveAnswer);
     socket.on('receive-ice-candidate', receiveIceCandidate);
-
+    socket.on('user-disconnected', userDisconnected);
     return () => {
       socket.off('join-room', id);
       socket.off('new-user-joined', newUserJoined);
       socket.off('receive-offer', receiveOffer);
       socket.off('receive-answer', receiveAnswer);
       socket.off('receive-ice-candidate', receiveIceCandidate);
+      socket.off('user-disconnected', userDisconnected);
     };
   }, [id]);
 

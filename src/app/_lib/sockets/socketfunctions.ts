@@ -2,6 +2,7 @@ import socket from './socket';
 import peerConnectionManager from '../peer-connection/peerConnectionManager';
 import localMediaStreamsStore from '../store/localMeidaStreamsStore';
 import { setupMediaStream } from '@/app/_lib/peer-connection/setUpMediaStream';
+import remoteStreamsStore from '../store/remoteStreamsStore';
 
 const newUserJoined = async (socketId: string) => {
   const peerConnection = peerConnectionManager.createConnection(socketId);
@@ -113,4 +114,17 @@ const receiveIceCandidate = async ({
   }
 };
 
-export { newUserJoined, receiveOffer, receiveAnswer, receiveIceCandidate };
+const userDisconnected = (socketId: string) => {
+  const peerConnection = peerConnectionManager.getConnection(socketId);
+  remoteStreamsStore.removeStream(socketId);
+  peerConnectionManager.removeConnection(socketId);
+  peerConnection?.peer?.close();
+};
+
+export {
+  newUserJoined,
+  receiveOffer,
+  receiveAnswer,
+  receiveIceCandidate,
+  userDisconnected,
+};

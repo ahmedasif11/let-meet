@@ -24,6 +24,13 @@ class PeerConnectionManager {
   getAllConnections(): { [socketId: string]: PeerConnection } {
     return this.connections;
   }
+
+  resetAllConnections = () => {
+    for (const key in this.connections) {
+      this.connections[key]?.peer?.close();
+      delete this.connections[key];
+    }
+  };
 }
 
 const peerConnectionManager = new PeerConnectionManager();

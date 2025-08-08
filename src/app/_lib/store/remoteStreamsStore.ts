@@ -22,6 +22,7 @@ const remoteStreamsStore = {
 
   removeStream: (socketId: string) => {
     if (remoteStreams[socketId]) {
+      remoteStreams[socketId].getTracks().forEach((track) => track.stop());
       delete remoteStreams[socketId];
       remoteStreamsStore.notifyListeners();
     }

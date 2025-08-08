@@ -22,6 +22,11 @@ export default function LocalVideo({ className }: { className: string }) {
 
   useEffect(() => {
     setupMedia();
+    return () => {
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = null;
+      }
+    };
   }, []);
 
   return (
