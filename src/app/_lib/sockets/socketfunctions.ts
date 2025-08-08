@@ -9,9 +9,9 @@ const newUserJoined = async (socketId: string) => {
 
   localMediaStreams.forEach((stream) => {
     stream.getTracks().forEach((track) => {
-      console.log('Adding local stream track:', track);
       const transceiver = peerConnection.peer?.addTransceiver(track.kind, {
         direction: 'sendrecv',
+        streams: [stream],
       });
       transceiver?.sender.replaceTrack(track);
     });
@@ -32,6 +32,7 @@ const newUserJoined = async (socketId: string) => {
       to: socketId,
     });
   } catch (error) {
+    console.error('Error sending offer:', error);
     peerConnection.reset();
   }
 };
@@ -44,17 +45,12 @@ const receiveOffer = async ({ offer, from }: { offer: any; from: any }) => {
   if (!localMediaStreams || localMediaStreams.length === 0) {
     const stream = await setupMediaStream();
     localMediaStreamsStore.setLocalMediaStreams([stream]);
-
-    localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
+    localMediaStreams = [stream];
   }
 
   localMediaStreams.forEach((stream) => {
-    console.log('Adding local stream by new joined peer:', stream);
     stream.getTracks().forEach((track) => {
-      const transceiver = peerConnection.peer?.addTransceiver(track.kind, {
-        direction: 'sendrecv',
-      });
-      transceiver?.sender.replaceTrack(track);
+      peerConnection.peer?.addTrack(track, stream);
     });
   });
 
@@ -64,6 +60,7 @@ const receiveOffer = async ({ offer, from }: { offer: any; from: any }) => {
 
   try {
     await peerConnection.setRemoteDescription(offer);
+
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 
@@ -74,6 +71,7 @@ const receiveOffer = async ({ offer, from }: { offer: any; from: any }) => {
       to: from,
     });
   } catch (error) {
+    console.error('Error handling received offer:', error);
     peerConnection.reset();
   }
 };

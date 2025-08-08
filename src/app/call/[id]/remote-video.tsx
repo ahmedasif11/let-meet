@@ -25,13 +25,7 @@ export default function RemoteVideo({
 
   return (
     <div>
-      <video
-        ref={remoteVideoRef}
-        autoPlay
-        playsInline
-        muted
-        className={className}
-      />
+      <video ref={remoteVideoRef} autoPlay playsInline className={className} />
     </div>
   );
 }

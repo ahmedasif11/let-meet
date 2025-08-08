@@ -35,6 +35,9 @@ class PeerConnection {
       if (!stream) {
         stream = new MediaStream([event.track]);
       }
+      if (event.track.kind === 'audio') {
+        console.log('Received audio track:', event.track);
+      }
       console.log(
         'Adding remote stream:',
         stream,
