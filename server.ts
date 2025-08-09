@@ -78,11 +78,15 @@ app
 
       socket.on('disconnect', () => {
         console.log('user disconnected:', socket.id);
+        const peer = connectedPeers[socket.id];
+        if (peer && peer.room) {
+          io.to(peer.room).emit('user-disconnected', socket.id);
+          // Remove from room array
+          rooms[peer.room] = (rooms[peer.room] || []).filter(
+            (id) => id !== socket.id
+          );
+        }
         delete connectedPeers[socket.id];
-        io.to(connectedPeers[socket.id].room).emit(
-          'user-disconnected',
-          socket.id
-        );
       });
 
       socket.on('end-call', () => {

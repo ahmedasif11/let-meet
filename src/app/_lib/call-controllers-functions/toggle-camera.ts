@@ -1,31 +1,22 @@
 import localMediaStreamsStore from '@/app/_lib/store/localMeidaStreamsStore';
-import peerConnectionManager from '@/app/_lib/peer-connection/peerConnectionManager';
+import cameraStateStore from '../store/cameraStateChangeStore';
 
 let isCameraOn = true;
 
 export const toggleCamera = () => {
   const streams = localMediaStreamsStore.getLocalMediaStreams();
-  const videoTracks = streams
+
+  const videoTrack = streams
     ?.flatMap((stream) => stream.getVideoTracks())
     .find(Boolean);
 
-  if (!videoTracks) return;
+  if (!videoTrack) return;
 
-  const connections = peerConnectionManager.getAllConnections?.();
-  if (!connections) return;
+  videoTrack.enabled = !isCameraOn;
 
-  Object.values(connections).forEach((connection) => {
-    const senders = connection.peer?.getSenders?.() || [];
-    const videoSender = senders.find((s) => s.track?.kind === 'video');
-
-    if (!videoSender) return;
-
-    if (isCameraOn) {
-      videoSender.replaceTrack(null);
-    } else {
-      videoSender.replaceTrack(videoTracks);
-    }
-  });
+  console.log(videoTrack);
 
   isCameraOn = !isCameraOn;
+
+  cameraStateStore.setCameraEnabled(isCameraOn);
 };
