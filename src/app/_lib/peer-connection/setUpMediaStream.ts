@@ -7,8 +7,20 @@ export async function setupMediaStream() {
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
+      video: {
+        width: 1280,
+        height: 720,
+        frameRate: 30,
+        facingMode: 'user',
+        deviceId: 'default',
+        aspectRatio: 16 / 9,
+      },
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        deviceId: 'default',
+      },
     });
 
     if (!stream) {

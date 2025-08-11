@@ -2,6 +2,7 @@ import express from 'express';
 import { Server, Socket } from 'socket.io';
 import { createServer } from 'http';
 import next from 'next';
+import cors from 'cors';
 
 const port = parseInt(process.env.PORT || '3000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -12,12 +13,43 @@ app
   .prepare()
   .then(() => {
     const expressApp = express();
+
+    // Enable CORS for all routes
+    expressApp.use(
+      cors({
+        origin: '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: [
+          'Content-Type',
+          'Authorization',
+          'ngrok-skip-browser-warning',
+        ],
+        credentials: true,
+      })
+    );
+
+    // Additional headers for ngrok compatibility
+    expressApp.use((req, res, next) => {
+      res.header('ngrok-skip-browser-warning', 'true');
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, DELETE, OPTIONS'
+      );
+      res.header(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, ngrok-skip-browser-warning'
+      );
+      next();
+    });
+
     const server = createServer(expressApp);
 
     const io = new Server(server, {
       cors: {
-        origin: dev ? 'http://localhost:3000' : false,
+        origin: '*', // Allow all origins for Socket.IO
         methods: ['GET', 'POST'],
+        credentials: true,
       },
     });
 
@@ -102,9 +134,11 @@ app
       return handle(req, res);
     });
 
-    server.listen(port, (err?: Error) => {
+    server.listen(port, '0.0.0.0', (err?: Error) => {
       if (err) throw err;
       console.log(`Server is running on http://localhost:${port}`);
+      console.log(`Server is accessible from external IPs on port ${port}`);
+      console.log(`For ngrok access, use: ngrok http ${port}`);
     });
   })
   .catch((ex) => {
