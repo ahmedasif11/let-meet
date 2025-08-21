@@ -1,4 +1,4 @@
-let remoteStreams: { [key: string]: MediaStream } = {};
+const remoteStreams: { [key: string]: MediaStream } = {};
 
 let listeners: ((streams: { [key: string]: MediaStream }) => void)[] = [];
 

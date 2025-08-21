@@ -1,7 +1,8 @@
+// server.ts
 import express from 'express';
-import { Server, Socket } from 'socket.io';
 import { createServer } from 'http';
 import next from 'next';
+import { Server } from 'socket.io';
 import cors from 'cors';
 
 const port = parseInt(process.env.PORT || '3000', 10);
@@ -14,7 +15,7 @@ app
   .then(() => {
     const expressApp = express();
 
-    // Enable CORS for all routes
+    // CORS setup
     expressApp.use(
       cors({
         origin: '*',
@@ -28,7 +29,6 @@ app
       })
     );
 
-    // Additional headers for ngrok compatibility
     expressApp.use((req, res, next) => {
       res.header('ngrok-skip-browser-warning', 'true');
       res.header('Access-Control-Allow-Origin', '*');
@@ -47,7 +47,7 @@ app
 
     const io = new Server(server, {
       cors: {
-        origin: '*', // Allow all origins for Socket.IO
+        origin: '*',
         methods: ['GET', 'POST'],
         credentials: true,
       },
@@ -60,28 +60,73 @@ app
     }
 
     const connectedPeers: { [key: string]: Peer } = {};
-
-    const rooms: { [key: string]: string[] } = {};
+    const rooms: {
+      [key: string]: { adminId: string; userIds: string[] };
+    } = {};
 
     io.on('connection', (socket) => {
-      console.log('a user connected:', socket.id);
-
       connectedPeers[socket.id] = {
         id: socket.id,
         room: '',
         isConnected: false,
       };
 
-      socket.on('join-room', (roomId: string) => {
+      socket.on('joining-request', (roomId: string) => {
         if (!rooms[roomId]) {
-          rooms[roomId] = [];
+          rooms[roomId] = { adminId: socket.id, userIds: [socket.id] };
+          connectedPeers[socket.id].room = roomId;
+          connectedPeers[socket.id].isConnected = true;
+          socket.join(roomId);
+
+          socket.emit('joined-as-admin');
         } else {
-          io.to(roomId).emit('new-user-joined', socket.id);
+          const adminId = rooms[roomId].adminId;
+          connectedPeers[socket.id].room = roomId;
+          connectedPeers[socket.id].isConnected = false;
+
+          if (adminId !== socket.id) {
+            socket.to(adminId).emit('new-user-joining-room', socket.id);
+          } else {
+            socket.emit('joined-as-admin');
+          }
         }
-        socket.join(roomId);
-        rooms[roomId].push(socket.id);
-        connectedPeers[socket.id].room = roomId;
-        socket.emit('joined-room', roomId);
+      });
+
+      socket.on('joining-request-accepted', (socketId: string) => {
+        const roomId = connectedPeers[socketId]?.room;
+        if (!roomId) {
+          return;
+        }
+
+        if (rooms[roomId].userIds.includes(socketId)) {
+          return;
+        }
+
+        connectedPeers[socketId].isConnected = true;
+        rooms[roomId].userIds.push(socketId);
+        io.sockets.sockets.get(socketId)?.join(roomId);
+
+        socket.to(roomId).emit('joining-request-accepted', socketId);
+
+        setTimeout(() => {
+          socket.emit('user-accepted-and-connected', socketId);
+        }, 500);
+      });
+
+      socket.on('joining-request-rejected', (socketId: string) => {
+        const roomId = connectedPeers[socketId]?.room;
+        if (!roomId) {
+          return;
+        }
+
+        io.to(socketId).emit('joining-request-rejected');
+
+        delete connectedPeers[socketId];
+        if (rooms[roomId]) {
+          rooms[roomId].userIds = rooms[roomId].userIds.filter(
+            (id) => id !== socketId
+          );
+        }
       });
 
       socket.on(
@@ -94,51 +139,62 @@ app
         }
       );
 
-      socket.on('send-offer', ({ offer, to }: { offer: any; to: any }) => {
-        io.to(to).emit('receive-offer', {
-          offer,
-          from: socket.id,
-        });
-      });
+      socket.on(
+        'send-offer',
+        ({ offer, to }: { offer: RTCSessionDescriptionInit; to: string }) => {
+          io.to(to).emit('receive-offer', {
+            offer,
+            from: socket.id,
+          });
+        }
+      );
 
-      socket.on('send-answer', ({ answer, to }: { answer: any; to: any }) => {
-        io.to(to).emit('receive-answer', {
-          answer,
-          from: socket.id,
-        });
+      socket.on(
+        'send-answer',
+        ({ answer, to }: { answer: RTCSessionDescriptionInit; to: string }) => {
+          io.to(to).emit('receive-answer', {
+            answer,
+            from: socket.id,
+          });
+        }
+      );
+
+      socket.on('end-call', () => {
+        const roomId = connectedPeers[socket.id]?.room;
+        if (roomId) {
+          io.to(roomId).emit('user-disconnected', socket.id);
+        }
       });
 
       socket.on('disconnect', () => {
-        console.log('user disconnected:', socket.id);
         const peer = connectedPeers[socket.id];
         if (peer && peer.room) {
-          io.to(peer.room).emit('user-disconnected', socket.id);
-          // Remove from room array
-          rooms[peer.room] = (rooms[peer.room] || []).filter(
-            (id) => id !== socket.id
-          );
-        }
-        delete connectedPeers[socket.id];
-      });
+          const roomId = peer.room;
+          io.to(roomId).emit('user-disconnected', socket.id);
 
-      socket.on('end-call', () => {
-        io.to(connectedPeers[socket.id].room).emit(
-          'user-disconnected',
-          socket.id
-        );
+          if (rooms[roomId]) {
+            rooms[roomId].userIds = rooms[roomId].userIds.filter(
+              (id) => id !== socket.id
+            );
+
+            if (rooms[roomId].userIds.length === 0) {
+              delete rooms[roomId];
+            }
+          }
+        }
+
+        delete connectedPeers[socket.id];
       });
     });
 
-    // Handle all Next.js requests
+    // Let Next.js handle frontend requests
     expressApp.all('*', (req, res) => {
       return handle(req, res);
     });
 
     server.listen(port, '0.0.0.0', (err?: Error) => {
       if (err) throw err;
-      console.log(`Server is running on http://localhost:${port}`);
-      console.log(`Server is accessible from external IPs on port ${port}`);
-      console.log(`For ngrok access, use: ngrok http ${port}`);
+      console.log(`Server ready at http://localhost:${port}`);
     });
   })
   .catch((ex) => {

@@ -5,8 +5,19 @@ import { setupMediaStream } from '@/app/_lib/peer-connection/setUpMediaStream';
 import remoteStreamsStore from '../store/remoteStreamsStore';
 
 const newUserJoined = async (socketId: string) => {
+  console.log(
+    `[newUserJoined] Setting up connection for new user: ${socketId}`
+  );
+
   const peerConnection = peerConnectionManager.createConnection(socketId);
   const localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
+
+  if (localMediaStreams.length === 0) {
+    console.log(
+      `[newUserJoined] No local media streams found! This is the problem.`
+    );
+    return;
+  }
 
   localMediaStreams.forEach((stream) => {
     stream.getTracks().forEach((track) => {
@@ -38,9 +49,16 @@ const newUserJoined = async (socketId: string) => {
   }
 };
 
-const receiveOffer = async ({ offer, from }: { offer: any; from: any }) => {
-  const peerConnection = peerConnectionManager.createConnection(from);
+const receiveOffer = async ({
+  offer,
+  from,
+}: {
+  offer: RTCSessionDescriptionInit;
+  from: string;
+}) => {
+  console.log(`[receiveOffer] Received offer from ${from}`);
 
+  const peerConnection = peerConnectionManager.createConnection(from);
   let localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
 
   if (!localMediaStreams || localMediaStreams.length === 0) {
@@ -77,7 +95,13 @@ const receiveOffer = async ({ offer, from }: { offer: any; from: any }) => {
   }
 };
 
-const receiveAnswer = async ({ answer, from }: { answer: any; from: any }) => {
+const receiveAnswer = async ({
+  answer,
+  from,
+}: {
+  answer: RTCSessionDescriptionInit;
+  from: string;
+}) => {
   const peerConnection = peerConnectionManager.getConnection(from);
 
   if (!peerConnection) {
@@ -89,6 +113,7 @@ const receiveAnswer = async ({ answer, from }: { answer: any; from: any }) => {
     console.log('Answer received and remote description set:', { from });
     socket.emit('call-connected', { to: from });
   } catch (error) {
+    console.error('Error handling received answer:', error);
     peerConnection.reset();
   }
 };
@@ -121,10 +146,17 @@ const userDisconnected = (socketId: string) => {
   peerConnection?.peer?.close();
 };
 
+const newUserJoiningRoom = (socketId: string) => {
+  // This function is now handled directly in the main component
+  // Keeping it for backward compatibility but it's not used anymore
+  console.log('New user joining room (legacy function):', socketId);
+};
+
 export {
   newUserJoined,
   receiveOffer,
   receiveAnswer,
   receiveIceCandidate,
   userDisconnected,
+  newUserJoiningRoom,
 };

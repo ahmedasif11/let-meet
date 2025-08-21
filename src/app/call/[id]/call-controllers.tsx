@@ -19,7 +19,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function CallControllers() {
+export default function CallControllers({ className }: { className?: string }) {
   const router = useRouter();
 
   // state for toggles
@@ -28,7 +28,9 @@ export default function CallControllers() {
   const [screenSharing, setScreenSharing] = useState(false);
 
   return (
-    <div className="flex gap-3 mt-10 bg-gray-100 p-2 rounded-lg absolute bottom-10">
+    <div
+      className={`flex gap-3 mt-10 bg-gray-100 p-2 rounded-lg absolute bottom-10 ${className}`}
+    >
       <Button
         className="hover:bg-gray-300"
         title="Toggle Microphone"
