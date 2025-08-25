@@ -23,8 +23,8 @@ export default function CallControllers({ className }: { className?: string }) {
   const router = useRouter();
 
   // state for toggles
-  const [micOn, setMicOn] = useState(true);
-  const [cameraOn, setCameraOn] = useState(true);
+  const [micOn, setMicOn] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
   const [screenSharing, setScreenSharing] = useState(false);
 
   return (

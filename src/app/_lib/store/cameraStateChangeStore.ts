@@ -1,4 +1,4 @@
-let cameraEnabled = true;
+let cameraEnabled = false;
 const subscribers: ((enabled: boolean) => void)[] = [];
 
 const cameraStateChangeStore = {

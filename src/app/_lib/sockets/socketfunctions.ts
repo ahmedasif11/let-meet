@@ -3,6 +3,7 @@ import peerConnectionManager from '../peer-connection/peerConnectionManager';
 import localMediaStreamsStore from '../store/localMeidaStreamsStore';
 import { setupMediaStream } from '@/app/_lib/peer-connection/setUpMediaStream';
 import remoteStreamsStore from '../store/remoteStreamsStore';
+import { toggleCamera, toggleMic } from '../call-controllers-functions';
 
 const newUserJoined = async (socketId: string) => {
   console.log(
@@ -65,6 +66,8 @@ const receiveOffer = async ({
     const stream = await setupMediaStream();
     localMediaStreamsStore.setLocalMediaStreams([stream]);
     localMediaStreams = [stream];
+    toggleCamera();
+    toggleMic();
   }
 
   localMediaStreams.forEach((stream) => {
