@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import { getSocketUrl } from '../config';
+import { getSocketUrl } from '../utils/config';
 import WebRTCConfig from '../config/webrtc.config';
 
 let socket: any;

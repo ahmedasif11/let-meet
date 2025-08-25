@@ -1,7 +1,7 @@
 import socket from './socket';
 import peerConnectionManager from '../peer-connection/peerConnectionManager';
 import localMediaStreamsStore from '../store/localMeidaStreamsStore';
-import { setupMediaStream } from '@/app/_lib/peer-connection/setUpMediaStream';
+import { setupMediaStream } from '@/lib/peer-connection/setUpMediaStream';
 import remoteStreamsStore from '../store/remoteStreamsStore';
 import { toggleCamera, toggleMic } from '../call-controllers-functions';
 

@@ -1,4 +1,4 @@
-import localMediaStreamsStore from '@/app/_lib/store/localMeidaStreamsStore';
+import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
 
 let isMicOn = true;
 

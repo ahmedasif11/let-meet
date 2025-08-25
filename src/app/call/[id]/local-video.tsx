@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import localMediaStreamsStore from '@/app/_lib/store/localMeidaStreamsStore';
-import cameraStateChangeStore from '@/app/_lib/store/cameraStateChangeStore';
-import { setupMediaStream } from '@/app/_lib/peer-connection/setUpMediaStream';
-import { toggleCamera, toggleMic } from '@/app/_lib/call-controllers-functions';
+import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
+import cameraStateChangeStore from '@/lib/store/cameraStateChangeStore';
+import { setupMediaStream } from '@/lib/peer-connection/setUpMediaStream';
+import { toggleCamera, toggleMic } from '@/lib/call-controllers-functions';
 
 export default function LocalVideo({ className }: { className: string }) {
   const localVideoRef = useRef<HTMLVideoElement>(null);

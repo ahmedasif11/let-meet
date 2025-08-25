@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import CallControllers from './call-controllers';
 import LocalVideo from './local-video';
 import RemoteVideo from './remote-video';
-import socket from '../../_lib/sockets/socket';
-import remoteStreamsStore from '@/app/_lib/store/remoteStreamsStore';
-import localMediaStreamsStore from '../../_lib/store/localMeidaStreamsStore';
+import socket from '../../../lib/sockets/socket';
+import remoteStreamsStore from '@/lib/store/remoteStreamsStore';
+import localMediaStreamsStore from '../../../lib/store/localMeidaStreamsStore';
 import Notification from './notification';
 
 import {
@@ -15,7 +15,7 @@ import {
   receiveAnswer,
   receiveIceCandidate,
   userDisconnected,
-} from '@/app/_lib/sockets/socketfunctions';
+} from '@/lib/sockets/socketfunctions';
 import { useParams } from 'next/navigation';
 import JoiningCall from './joining-call';
 

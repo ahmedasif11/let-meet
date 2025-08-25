@@ -1,4 +1,4 @@
-import localMediaStreamsStore from '@/app/_lib/store/localMeidaStreamsStore';
+import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
 import cameraStateStore from '../store/cameraStateChangeStore';
 
 let isCameraOn = true;

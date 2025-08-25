@@ -1,5 +1,5 @@
-import peerConnectionManager from '@/app/_lib/peer-connection/peerConnectionManager';
-import localMediaStreamsStore from '@/app/_lib/store/localMeidaStreamsStore';
+import peerConnectionManager from '@/lib/peer-connection/peerConnectionManager';
+import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
 import socket from '../sockets/socket';
 
 export const endCall = () => {

@@ -15,7 +15,7 @@ import {
   toggleMic,
   toggleScreenShare,
   endCall,
-} from '@/app/_lib/call-controllers-functions';
+} from '@/lib/call-controllers-functions';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
