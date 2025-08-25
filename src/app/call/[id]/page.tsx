@@ -24,11 +24,41 @@ export default function CallPage() {
   const [remoteStreams, setRemoteStreams] = useState<MediaStream[]>([]);
   const [isRejected, setIsRejected] = useState(false);
   const [pendingUsers, setPendingUsers] = useState<string[]>([]);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const { id } = useParams();
 
+  // Debug effect to show current state
+  useEffect(() => {
+    setDebugInfo(
+      `Admin: ${isJoinedCall}, Pending: ${pendingUsers.length}, Room: ${id}`
+    );
+    console.log('[Admin] State updated:', {
+      isJoinedCall,
+      pendingUsers: pendingUsers.length,
+      roomId: id,
+    });
+  }, [isJoinedCall, pendingUsers.length, id]);
+
+  // Debug effect for pending users
+  useEffect(() => {
+    if (pendingUsers.length > 0) {
+      console.log('[Admin] Pending users changed:', pendingUsers);
+    }
+  }, [pendingUsers]);
+
   useEffect(() => {
     if (!id) return;
+
+    // Request notification permission for better user experience
+    if (
+      'Notification' in window &&
+      (Notification as any).permission === 'default'
+    ) {
+      (Notification as any).requestPermission().then((permission: string) => {
+        console.log('[Notifications] Permission:', permission);
+      });
+    }
 
     socket.emit('joining-request', id);
 
@@ -50,7 +80,40 @@ export default function CallPage() {
 
     const handleNewUserJoining = (socketId: string) => {
       console.log('[Socket] New user wants to join:', socketId);
-      setPendingUsers((prev) => [...prev, socketId]);
+      console.log('[Admin] Adding user to pending list:', socketId);
+
+      // Play notification sound
+      try {
+        const audio = new Audio(
+          'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT'
+        );
+        audio.volume = 0.3;
+        audio.play().catch((e) => console.log('Audio play failed:', e));
+      } catch (e) {
+        console.log('Audio notification failed:', e);
+      }
+
+      // Show browser notification if available
+      if (
+        'Notification' in window &&
+        (Notification as any).permission === 'granted'
+      ) {
+        try {
+          new (Notification as any)('New User Wants to Join', {
+            body: `User ${socketId.slice(0, 8)}... wants to join your call`,
+            icon: '/favicon.ico',
+            tag: 'join-request',
+          });
+        } catch (e) {
+          console.log('Browser notification failed:', e);
+        }
+      }
+
+      setPendingUsers((prev) => {
+        const newList = [...prev, socketId];
+        console.log('[Admin] Current pending users:', newList);
+        return newList;
+      });
     };
 
     const handleUserAcceptedAndConnected = (socketId: string) => {
@@ -117,7 +180,52 @@ export default function CallPage() {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen relative">
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-4 left-4 z-50 bg-black/80 text-white p-2 rounded text-xs font-mono">
+          {debugInfo}
+          <button
+            className="ml-2 bg-blue-500 px-2 py-1 rounded text-xs"
+            onClick={() => {
+              const testSocketId = 'test-' + Date.now();
+              setPendingUsers((prev) => [...prev, testSocketId]);
+              console.log('[Admin] Test notification added:', testSocketId);
+            }}
+          >
+            Test Notif
+          </button>
+        </div>
+      )}
+
+      {/* Prominent Notification Banner */}
+      {pendingUsers.length > 0 && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-red-500 text-white p-3 text-center animate-pulse">
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-4 h-4 bg-white rounded-full animate-bounce"></div>
+            <span className="font-bold text-lg">
+              🚨 {pendingUsers.length} User{pendingUsers.length > 1 ? 's' : ''}{' '}
+              Waiting to Join Your Call!
+            </span>
+            <div className="w-4 h-4 bg-white rounded-full animate-bounce"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications Container - Fixed position for better visibility */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-4 max-h-screen overflow-y-auto">
+        {pendingUsers.length > 0 && (
+          <div className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold animate-pulse">
+            {pendingUsers.length}
+          </div>
+        )}
+        {pendingUsers.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2">
+            <p className="text-blue-800 text-sm font-medium">
+              {pendingUsers.length} user{pendingUsers.length > 1 ? 's' : ''}{' '}
+              waiting to join
+            </p>
+          </div>
+        )}
         {pendingUsers.map((socketId) => (
           <Notification
             key={socketId}
