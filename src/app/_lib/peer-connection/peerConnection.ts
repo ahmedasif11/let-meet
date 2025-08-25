@@ -1,5 +1,6 @@
 import socket from '../sockets/socket';
 import remoteStreamsStore from '../store/remoteStreamsStore';
+import WebRTCConfig from '../config/webrtc.config';
 
 class PeerConnection {
   peer: RTCPeerConnection | null = null;
@@ -12,11 +13,8 @@ class PeerConnection {
 
   private initializePeerConnection() {
     this.peer = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: ['stun:stun.l.google.com:19302'],
-        },
-      ],
+      iceServers: WebRTCConfig.iceServers,
+      ...WebRTCConfig.peerConnectionConfig,
     });
 
     this.peer.onicecandidate = (event) => {
@@ -48,11 +46,32 @@ class PeerConnection {
         remoteStreamsStore.addStream(stream, this.targetSocketId);
       }
     };
+
+    // Add connection state monitoring
+    this.peer.onconnectionstatechange = () => {
+      console.log('Connection state:', this.peer?.connectionState);
+    };
+
+    this.peer.oniceconnectionstatechange = () => {
+      console.log('ICE connection state:', this.peer?.iceConnectionState);
+    };
+
+    this.peer.onicegatheringstatechange = () => {
+      console.log('ICE gathering state:', this.peer?.iceGatheringState);
+    };
+
+    // Optimize for better performance
+    this.peer.onicecandidateerror = (event) => {
+      console.warn('ICE candidate error:', event);
+    };
   }
 
   async createOffer() {
     if (!this.peer) throw new Error('Peer connection not initialized');
-    const offer = await this.peer.createOffer();
+    const offer = await this.peer.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    });
     return offer;
   }
 

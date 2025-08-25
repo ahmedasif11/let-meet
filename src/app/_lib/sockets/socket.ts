@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import { getSocketUrl } from '../config';
+import WebRTCConfig from '../config/webrtc.config';
 
 let socket: any;
 
@@ -9,15 +10,8 @@ function initSocket(): any {
 
     console.log('Connecting to socket server:', socketUrl);
 
-    socket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      upgrade: true,
-      rememberUpgrade: true,
-      timeout: 20000,
-      forceNew: true,
-    });
+    socket = io(socketUrl, WebRTCConfig.socketConfig);
 
-    // Add connection event listeners
     socket.on('connect', () => {
       console.log('Socket connected successfully');
     });
