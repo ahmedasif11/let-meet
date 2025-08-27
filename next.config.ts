@@ -6,6 +6,18 @@ const nextConfig: NextConfig = {
     'https://*.ngrok-free.app',
     'http://localhost:3000',
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
