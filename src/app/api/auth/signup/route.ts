@@ -7,7 +7,7 @@ import generateOTP from '@/lib/utils/generateOTP';
 import verifyEmail from '@/lib/verification/verify-email';
 import { createVerificationToken } from '@/lib/utils/generateToken';
 
-const OTP_EXPIRY_MINUTES = 60;
+const OTP_EXPIRY_MINUTES = 5;
 
 export async function POST(request: NextRequest) {
   try {

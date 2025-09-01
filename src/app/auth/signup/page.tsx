@@ -51,7 +51,9 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Failed to sign up');
+        const errorData = await response.json();
+        console.error('Failed to sign up:', errorData.message);
+        alert(errorData.message || 'Failed to sign up');
         return;
       }
 

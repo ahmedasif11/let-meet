@@ -5,6 +5,9 @@ const localMediaStreamsStore = {
   setLocalMediaStreams: (streams: MediaStream[]) => {
     localMediaStreams = streams;
   },
+  clearLocalMediaStreams: () => {
+    localMediaStreams = [];
+  },
 };
 
 export default localMediaStreamsStore;

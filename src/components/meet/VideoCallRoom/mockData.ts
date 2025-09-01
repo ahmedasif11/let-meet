@@ -1,0 +1,63 @@
+import { Participant } from './types';
+
+// Enhanced mock participants with more realistic data
+export const mockParticipants: Participant[] = [
+  {
+    id: 'you',
+    name: 'You',
+    isVideoOn: true,
+    isAudioOn: true,
+    connectionQuality: 'good',
+    isYou: true,
+    isSpeaking: false,
+    joinedAt: new Date(Date.now() - 600000),
+  },
+  {
+    id: 'alice',
+    name: 'Alice Johnson',
+    isVideoOn: true,
+    isAudioOn: true,
+    connectionQuality: 'good',
+    isHost: true,
+    isSpeaking: false,
+    joinedAt: new Date(Date.now() - 480000),
+  },
+  {
+    id: 'bob',
+    name: 'Bob Smith',
+    isVideoOn: false,
+    isAudioOn: true,
+    connectionQuality: 'poor',
+    isHandRaised: true,
+    isSpeaking: true,
+    joinedAt: new Date(Date.now() - 360000),
+  },
+  {
+    id: 'carol',
+    name: 'Carol Davis',
+    isVideoOn: true,
+    isAudioOn: false,
+    connectionQuality: 'good',
+    isSpeaking: false,
+    joinedAt: new Date(Date.now() - 240000),
+  },
+  {
+    id: 'david',
+    name: 'David Wilson',
+    isVideoOn: true,
+    isAudioOn: true,
+    connectionQuality: 'good',
+    isScreenSharing: true,
+    isSpeaking: false,
+    joinedAt: new Date(Date.now() - 120000),
+  },
+  {
+    id: 'eva',
+    name: 'Eva Brown',
+    isVideoOn: true,
+    isAudioOn: true,
+    connectionQuality: 'disconnected',
+    isSpeaking: false,
+    joinedAt: new Date(Date.now() - 60000),
+  },
+];

@@ -17,12 +17,12 @@ import {
   endCall,
 } from '@/lib/call-controllers-functions';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import screenShareStateStore from '@/lib/store/screenShareStore';
 
 export default function CallControllers({ className }: { className?: string }) {
   const router = useRouter();
 
-  // state for toggles
   const [micOn, setMicOn] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
   const [screenSharing, setScreenSharing] = useState(false);
