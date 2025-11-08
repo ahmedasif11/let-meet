@@ -1,6 +1,6 @@
 import socket from './socket';
 import peerConnectionManager from '../peer-connection/peerConnectionManager';
-import localMediaStreamsStore from '../store/localMeidaStreamsStore';
+import localMediaStreamsStore from '../store/localMediaStreamsStore';
 import { setupMediaStream } from '@/lib/peer-connection/setUpMediaStream';
 import remoteStreamsStore from '../store/remoteStreamsStore';
 import { toggleCamera, toggleMic } from '../call-controllers-functions';
@@ -11,22 +11,35 @@ const newUserJoined = async (socketId: string) => {
   );
 
   const peerConnection = peerConnectionManager.createConnection(socketId);
-  const localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
+  let localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
 
+  // Ensure we have local media streams
   if (localMediaStreams.length === 0) {
     console.log(
-      `[newUserJoined] No local media streams found! This is the problem.`
+      `[newUserJoined] No local media streams found, setting up new stream.`
     );
-    return;
+    try {
+      const stream = await setupMediaStream();
+      localMediaStreamsStore.setLocalMediaStreams([stream]);
+      localMediaStreams = [stream];
+    } catch (error) {
+      console.error('Failed to setup media stream:', error);
+      return;
+    }
   }
 
+  // Add tracks to peer connection more efficiently
   localMediaStreams.forEach((stream) => {
     stream.getTracks().forEach((track) => {
-      const transceiver = peerConnection.peer?.addTransceiver(track.kind, {
-        direction: 'sendrecv',
-        streams: [stream],
-      });
-      transceiver?.sender.replaceTrack(track);
+      // Check if track is already added to avoid duplicates
+      const existingSenders = peerConnection.peer?.getSenders() || [];
+      const trackAlreadyAdded = existingSenders.some(
+        (sender) => sender.track && sender.track.kind === track.kind
+      );
+
+      if (!trackAlreadyAdded) {
+        peerConnection.peer?.addTrack(track, stream);
+      }
     });
   });
 
@@ -63,16 +76,30 @@ const receiveOffer = async ({
   let localMediaStreams = localMediaStreamsStore.getLocalMediaStreams();
 
   if (!localMediaStreams || localMediaStreams.length === 0) {
-    const stream = await setupMediaStream();
-    localMediaStreamsStore.setLocalMediaStreams([stream]);
-    localMediaStreams = [stream];
-    toggleCamera();
-    toggleMic();
+    try {
+      const stream = await setupMediaStream();
+      localMediaStreamsStore.setLocalMediaStreams([stream]);
+      localMediaStreams = [stream];
+      toggleCamera();
+      toggleMic();
+    } catch (error) {
+      console.error('Failed to setup media stream for offer:', error);
+      return;
+    }
   }
 
+  // Add tracks more efficiently, avoiding duplicates
   localMediaStreams.forEach((stream) => {
     stream.getTracks().forEach((track) => {
-      peerConnection.peer?.addTrack(track, stream);
+      // Check if track is already added
+      const existingSenders = peerConnection.peer?.getSenders() || [];
+      const trackAlreadyAdded = existingSenders.some(
+        (sender) => sender.track && sender.track.kind === track.kind
+      );
+
+      if (!trackAlreadyAdded) {
+        peerConnection.peer?.addTrack(track, stream);
+      }
     });
   });
 

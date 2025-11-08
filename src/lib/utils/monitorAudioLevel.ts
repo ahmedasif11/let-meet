@@ -9,7 +9,7 @@ export function monitorAudioLevel({
   const source = audioContext.createMediaStreamSource(stream);
   const analyzer = audioContext.createAnalyser();
 
-  analyzer.fftSize = 1024;
+  analyzer.fftSize = 512;
 
   const dataArray = new Uint8Array(analyzer.frequencyBinCount);
   source.connect(analyzer);

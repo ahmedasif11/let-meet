@@ -2,18 +2,24 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Button } from '../../../ui/button';
 import { Card, CardContent } from '../../../ui/card';
-import { CheckCircle, Phone } from 'lucide-react';
-import { CallSettings } from '../types';
+import { CheckCircle, Phone, AlertTriangle, Camera, Mic } from 'lucide-react';
+import { CallSettings, DeviceAvailability } from '../types';
 
 interface Step3ReadyToJoinProps {
   settings: CallSettings;
   onJoinCall: (settings: CallSettings) => void;
+  deviceAvailability?: DeviceAvailability;
 }
 
 export const Step3ReadyToJoin: React.FC<Step3ReadyToJoinProps> = ({
   settings,
   onJoinCall,
+  deviceAvailability,
 }) => {
+  const hasWarnings =
+    deviceAvailability &&
+    ((!deviceAvailability.hasCamera && settings.camera.enabled) ||
+      (!deviceAvailability.hasMicrophone && settings.microphone.enabled));
   return (
     <motion.div
       key="step3"
@@ -30,8 +36,38 @@ export const Step3ReadyToJoin: React.FC<Step3ReadyToJoinProps> = ({
 
           <h3 className="text-white text-xl mb-2">Ready to Join!</h3>
           <p className="text-gray-400 mb-6">
-            Your setup is complete and you're ready to join the meeting.
+            Your setup is complete and you&apos;re ready to join the meeting.
           </p>
+
+          {/* Device Status Warnings */}
+          {hasWarnings && (
+            <div className="bg-yellow-600/20 border border-yellow-600/50 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="text-yellow-400 font-medium mb-2">
+                    Device Warnings:
+                  </p>
+                  <ul className="space-y-1 text-yellow-300">
+                    {!deviceAvailability?.hasCamera &&
+                      settings.camera.enabled && (
+                        <li className="flex items-center gap-2">
+                          <Camera className="w-4 h-4" />
+                          Camera is enabled but not available
+                        </li>
+                      )}
+                    {!deviceAvailability?.hasMicrophone &&
+                      settings.microphone.enabled && (
+                        <li className="flex items-center gap-2">
+                          <Mic className="w-4 h-4" />
+                          Microphone is enabled but not available
+                        </li>
+                      )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Final settings summary */}
           <div className="bg-gray-700/50 rounded-lg p-4 mb-6 text-left">

@@ -58,20 +58,20 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
   return (
     <motion.div
       key="step1"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="space-y-6 w-full max-w-full min-w-0 overflow-x-hidden"
     >
       {/* Microphone Settings */}
-      <Card className="bg-gray-800/50 border-gray-700">
+      <Card className="bg-gray-800/50 border-gray-700 w-full">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Mic className="w-5 h-5" />
             Microphone Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 w-full min-w-0">
           {/* Microphone Device Select */}
           <div>
             <Label className="text-white mb-2 block">Microphone Device</Label>
@@ -87,10 +87,10 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
                 }))
               }
             >
-              <SelectTrigger className="bg-gray-700 border-gray-600">
-                <SelectValue />
+              <SelectTrigger className="bg-gray-700 border-gray-600 w-full overflow-hidden">
+                <SelectValue className="truncate" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full">
                 {devices.microphones.map((device) => (
                   <SelectItem key={device.deviceId} value={device.deviceId}>
                     {device.label}
@@ -134,14 +134,14 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
       </Card>
 
       {/* Speaker Settings */}
-      <Card className="bg-gray-800/50 border-gray-700">
+      <Card className="bg-gray-800/50 border-gray-700 w-full">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Volume2 className="w-5 h-5" />
             Speaker Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 w-full min-w-0">
           {/* Speaker Device Select */}
           <div>
             <Label className="text-white mb-2 block">Speaker Device</Label>
@@ -154,10 +154,10 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
                 }))
               }
             >
-              <SelectTrigger className="bg-gray-700 border-gray-600">
-                <SelectValue />
+              <SelectTrigger className="bg-gray-700 border-gray-600 w-full overflow-hidden">
+                <SelectValue className="truncate" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full">
                 {devices.speakers.map((device) => (
                   <SelectItem key={device.deviceId} value={device.deviceId}>
                     {device.label}

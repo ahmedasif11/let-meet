@@ -10,7 +10,7 @@ export interface Participant {
   isSpeaking?: boolean;
   isHost?: boolean;
   isYou?: boolean;
-  joinedAt: Date;
+  joinedAt: string;
 }
 
 export interface Reaction {
@@ -67,6 +67,7 @@ export interface CallSettings {
   };
   displayName: string;
   backgroundBlur: boolean;
+  avatar?: string;
 }
 
 export type LayoutMode = 'grid' | 'speaker' | 'sidebar';

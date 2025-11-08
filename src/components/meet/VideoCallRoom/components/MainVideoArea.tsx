@@ -4,6 +4,7 @@ import { Button } from '../../../ui/button';
 import { Badge } from '../../../ui/badge';
 import { MessageSquare, Users } from 'lucide-react';
 import { Participant, LayoutMode } from '../types';
+import { ParticipantGrid } from '../../ParticipantGrid';
 
 interface MainVideoAreaProps {
   activeParticipants: Participant[];
@@ -25,70 +26,16 @@ export const MainVideoArea: React.FC<MainVideoAreaProps> = ({
   unreadMessages,
 }) => {
   return (
-    <div className="flex-1 p-4 overflow-hidden relative">
+    <div className="flex-1 px-6 py-4 overflow-hidden relative min-w-0 min-h-0">
       <motion.div
         layout
-        className="h-full"
+        className="h-full w-full"
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       >
-        {activeParticipants.length <= 4 && layoutMode === 'grid' ? (
-          <div className="grid gap-2 md:gap-4 h-full grid-cols-2 grid-rows-2">
-            {activeParticipants.map((participant, index) => (
-              <div
-                key={participant.id}
-                className={`bg-gray-800 rounded-lg overflow-hidden ${
-                  participant.isScreenSharing ? 'col-span-2 row-span-2' : ''
-                }`}
-              >
-                <div className="aspect-video bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="w-16 h-16 bg-gray-600 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      {participant.avatar ? (
-                        <img
-                          src={participant.avatar}
-                          alt={participant.name}
-                          className="w-full h-full rounded-full"
-                        />
-                      ) : (
-                        <span className="text-xl font-bold">
-                          {participant.name.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm">{participant.name}</p>
-                    {participant.isScreenSharing && (
-                      <p className="text-xs">Screen Sharing</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="h-full bg-gray-800 rounded-lg overflow-hidden">
-            <div className="aspect-video bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-              <div className="text-center text-white">
-                <div className="w-24 h-24 bg-gray-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  {mainParticipant.avatar ? (
-                    <img
-                      src={mainParticipant.avatar}
-                      alt={mainParticipant.name}
-                      className="w-full h-full rounded-full"
-                    />
-                  ) : (
-                    <span className="text-2xl font-bold">
-                      {mainParticipant.name.charAt(0)}
-                    </span>
-                  )}
-                </div>
-                <p className="text-lg">{mainParticipant.name}</p>
-                {mainParticipant.isScreenSharing && (
-                  <p className="text-sm">Screen Sharing</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <ParticipantGrid
+          participants={activeParticipants}
+          screenSharingParticipant={screenSharingParticipant}
+        />
       </motion.div>
 
       {/* Quick action buttons (mobile) */}
@@ -97,7 +44,7 @@ export const MainVideoArea: React.FC<MainVideoAreaProps> = ({
           variant="secondary"
           size="icon"
           onClick={handleToggleChat}
-          className="rounded-full relative"
+          className="rounded-full relative bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 hover:bg-gray-700/80"
         >
           <MessageSquare className="w-5 h-5" />
           {unreadMessages > 0 && (
@@ -111,7 +58,7 @@ export const MainVideoArea: React.FC<MainVideoAreaProps> = ({
           variant="secondary"
           size="icon"
           onClick={handleToggleParticipants}
-          className="rounded-full"
+          className="rounded-full bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 hover:bg-gray-700/80"
         >
           <Users className="w-5 h-5" />
         </Button>

@@ -1,5 +1,5 @@
 import peerConnectionManager from '@/lib/peer-connection/peerConnectionManager';
-import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
+import localMediaStreamsStore from '@/lib/store/localMediaStreamsStore';
 import { setupMediaStream } from '@/lib/peer-connection/setUpMediaStream';
 import cameraStateChangeStore from '@/lib/store/cameraStateChangeStore';
 import screenShareStateStore from '@/lib/store/screenShareStore';

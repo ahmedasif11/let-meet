@@ -63,6 +63,15 @@ app
       id: string;
       room: string;
       isConnected: boolean;
+      participant: Participant;
+    }
+
+    interface Participant {
+      id: string;
+      name: string;
+      avatar?: string;
+      isVideoOn?: boolean;
+      isAudioOn?: boolean;
     }
 
     const connectedPeers: { [key: string]: Peer } = {};
@@ -75,49 +84,83 @@ app
         id: socket.id,
         room: '',
         isConnected: false,
+        participant: {
+          id: '',
+          name: '',
+          avatar: '',
+          isVideoOn: false,
+          isAudioOn: false,
+        },
       };
 
-      socket.on('joining-request', (roomId: string) => {
-        if (!rooms[roomId]) {
-          rooms[roomId] = { adminId: socket.id, userIds: [socket.id] };
-          connectedPeers[socket.id].room = roomId;
-          connectedPeers[socket.id].isConnected = true;
-          socket.join(roomId);
+      socket.on(
+        'joining-request',
+        ({
+          participant,
+          roomId,
+        }: {
+          participant: Participant;
+          roomId: string;
+        }) => {
+          if (!rooms[roomId]) {
+            rooms[roomId] = { adminId: socket.id, userIds: [socket.id] };
+            connectedPeers[socket.id].room = roomId;
+            connectedPeers[socket.id].isConnected = true;
+            connectedPeers[socket.id].participant = participant;
+            socket.join(roomId);
 
-          socket.emit('joined-as-admin');
-        } else {
-          const adminId = rooms[roomId].adminId;
-          connectedPeers[socket.id].room = roomId;
-          connectedPeers[socket.id].isConnected = false;
-
-          if (adminId !== socket.id) {
-            socket.to(adminId).emit('new-user-joining-room', socket.id);
-          } else {
             socket.emit('joined-as-admin');
+          } else {
+            const adminId = rooms[roomId].adminId;
+            connectedPeers[socket.id].room = roomId;
+            connectedPeers[socket.id].isConnected = false;
+            connectedPeers[socket.id].participant = participant;
+            if (adminId !== socket.id) {
+              socket.to(adminId).emit('new-user-joining-room', participant);
+            } else {
+              socket.emit('joined-as-admin');
+            }
           }
         }
-      });
+      );
 
-      socket.on('joining-request-accepted', (socketId: string) => {
-        const roomId = connectedPeers[socketId]?.room;
-        if (!roomId) {
-          return;
+      socket.on(
+        'joining-request-accepted',
+        ({ participant }: { participant: Participant }) => {
+          const socketId = participant.id;
+          if (!connectedPeers[socketId]) {
+            return;
+          }
+
+          if (connectedPeers[socketId].isConnected) {
+            return;
+          }
+
+          if (!connectedPeers[socketId].room) {
+            return;
+          }
+
+          const roomId = connectedPeers[socketId]?.room;
+          if (!roomId || !rooms[roomId]) {
+            return;
+          }
+
+          const participants = Object.values(connectedPeers)
+            .filter((peer: Peer) => peer.isConnected)
+            .map((peer: Peer) => peer.participant);
+
+          io.in(roomId).emit(
+            'user-accepted-and-connected',
+            connectedPeers[socketId].participant
+          );
+
+          connectedPeers[socketId].isConnected = true;
+          rooms[roomId].userIds.push(socketId);
+          io.sockets.sockets.get(socketId)?.join(roomId);
+
+          socket.to(socketId).emit('joining-request-accepted', participants);
         }
-
-        if (rooms[roomId].userIds.includes(socketId)) {
-          return;
-        }
-
-        connectedPeers[socketId].isConnected = true;
-        rooms[roomId].userIds.push(socketId);
-        io.sockets.sockets.get(socketId)?.join(roomId);
-
-        socket.to(roomId).emit('joining-request-accepted', socketId);
-
-        setTimeout(() => {
-          socket.emit('user-accepted-and-connected', socketId);
-        }, 500);
-      });
+      );
 
       socket.on('joining-request-rejected', (socketId: string) => {
         const roomId = connectedPeers[socketId]?.room;
@@ -165,12 +208,33 @@ app
         }
       );
 
-      socket.on('end-call', () => {
-        const roomId = connectedPeers[socket.id]?.room;
-        if (roomId) {
-          io.to(roomId).emit('user-disconnected', socket.id);
+      socket.on(
+        'media-status-change',
+        ({
+          videoEnabled,
+          audioEnabled,
+        }: {
+          videoEnabled: boolean;
+          audioEnabled: boolean;
+        }) => {
+          const roomId = connectedPeers[socket.id]?.room;
+          if (!roomId) {
+            return;
+          }
+
+          // Update the participant's state in the server
+          if (connectedPeers[socket.id]) {
+            connectedPeers[socket.id].participant.isVideoOn = videoEnabled;
+            connectedPeers[socket.id].participant.isAudioOn = audioEnabled;
+          }
+
+          io.in(roomId).emit('media-status-change', {
+            id: socket.id,
+            videoEnabled,
+            audioEnabled,
+          });
         }
-      });
+      );
 
       socket.on('disconnect', () => {
         const peer = connectedPeers[socket.id];

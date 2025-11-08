@@ -1,4 +1,4 @@
-import localMediaStreamsStore from '../store/localMeidaStreamsStore';
+import localMediaStreamsStore from '../store/localMediaStreamsStore';
 
 export async function setupMediaStream(): Promise<MediaStream> {
   if (!navigator.mediaDevices?.getUserMedia) {
@@ -57,6 +57,15 @@ interface Devices {
   speakers: MediaDeviceInfo[];
 }
 
+interface DeviceAvailability {
+  hasCamera: boolean;
+  hasMicrophone: boolean;
+  hasSpeaker: boolean;
+  cameraError?: string;
+  microphoneError?: string;
+  speakerError?: string;
+}
+
 export async function getMediaDevices(): Promise<Devices> {
   if (!navigator.mediaDevices?.enumerateDevices) {
     throw new Error('Browser does not support enumerateDevices API');
@@ -85,4 +94,58 @@ export async function getMediaDevices(): Promise<Devices> {
     console.error('Error getting media devices:', error);
     return { cameras: [], microphones: [], speakers: [] };
   }
+}
+
+export async function checkDeviceAvailability(): Promise<DeviceAvailability> {
+  const availability: DeviceAvailability = {
+    hasCamera: false,
+    hasMicrophone: false,
+    hasSpeaker: false,
+  };
+
+  try {
+    // Check if getUserMedia is supported
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error('Browser does not support getUserMedia API');
+    }
+
+    // Check camera availability
+    try {
+      const videoStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      availability.hasCamera = true;
+      videoStream.getTracks().forEach((track) => track.stop());
+    } catch (error) {
+      availability.cameraError =
+        error instanceof Error ? error.message : 'Camera access denied';
+    }
+
+    // Check microphone availability
+    try {
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      availability.hasMicrophone = true;
+      audioStream.getTracks().forEach((track) => track.stop());
+    } catch (error) {
+      availability.microphoneError =
+        error instanceof Error ? error.message : 'Microphone access denied';
+    }
+
+    // Check speaker availability (this is harder to test without playing audio)
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      availability.hasSpeaker = devices.some(
+        (device) => device.kind === 'audiooutput'
+      );
+    } catch (error) {
+      availability.speakerError =
+        error instanceof Error ? error.message : 'Speaker detection failed';
+    }
+  } catch (error) {
+    console.error('Error checking device availability:', error);
+  }
+
+  return availability;
 }

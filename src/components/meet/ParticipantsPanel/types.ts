@@ -10,7 +10,7 @@ export interface Participant {
   isSpeaking?: boolean;
   isHost?: boolean;
   isYou?: boolean;
-  joinedAt: Date;
+  joinedAt: string;
 }
 
 export interface ParticipantsPanelProps {

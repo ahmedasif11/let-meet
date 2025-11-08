@@ -7,6 +7,10 @@ const remoteStreamsStore = {
     if (!stream || !socketId) return;
 
     if (remoteStreams[socketId] !== stream) {
+      console.log(
+        `[RemoteStreamsStore] Adding stream for socketId: ${socketId}`,
+        stream
+      );
       remoteStreams[socketId] = stream;
       remoteStreamsStore.notifyListeners();
     }
@@ -41,6 +45,10 @@ const remoteStreamsStore = {
 
   notifyListeners: () => {
     const shallowCopy = { ...remoteStreams };
+    console.log(
+      `[RemoteStreamsStore] Notifying ${listeners.length} listeners with streams:`,
+      Object.keys(shallowCopy)
+    );
     listeners.forEach((cb) => cb(shallowCopy));
   },
 };

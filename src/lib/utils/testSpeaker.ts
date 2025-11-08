@@ -1,16 +1,15 @@
-export async function testSpeaker({
+export const testSpeaker = ({
   volume,
   sound,
 }: {
   volume: number;
   sound: HTMLAudioElement;
-}) {
-  sound.volume = volume / 100;
-
-  try {
-    // Play the audio
-    await sound.play();
-  } catch (error) {
-    console.error('Error playing sound:', error);
+}) => {
+  if (sound) {
+    sound.volume = volume / 100;
+    sound.currentTime = 0; // Reset to start
+    sound.play().catch((error) => {
+      console.error('Error playing test sound:', error);
+    });
   }
-}
+};

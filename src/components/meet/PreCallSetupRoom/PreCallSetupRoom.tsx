@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../../ui/button';
 import { Switch } from '../../ui/switch';
 import { Label } from '../../ui/label';
@@ -12,34 +12,39 @@ import {
   Users,
   Headphones,
   Settings,
+  AlertTriangle,
 } from 'lucide-react';
 
 // Import from extracted modules
-import { PreCallSetupRoomProps, CallSettings, Devices, Step } from './types';
+import {
+  PreCallSetupRoomProps,
+  CallSettings,
+  Devices,
+  Step,
+  DeviceAvailability,
+} from './types';
 import { formatTime, canProceedToNextStep } from './utils';
 import { useDeviceTesting } from './hooks/useDeviceTesting';
 import { Step0CameraMic } from './components/Step0CameraMic';
 import { Step1AudioSettings } from './components/Step1AudioSettings';
 import { Step2DeviceTesting } from './components/Step2DeviceTesting';
 import { Step3ReadyToJoin } from './components/Step3ReadyToJoin';
-import { getMediaDevices } from '../../../lib/peer-connection/setUpMediaStream';
+import {
+  getMediaDevices,
+  checkDeviceAvailability,
+} from '../../../lib/peer-connection/setUpMediaStream';
 import { monitorAudioLevel } from '@/lib/utils/monitorAudioLevel';
-import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
+import localMediaStreamsStore from '@/lib/store/localMediaStreamsStore';
 
 export function PreCallSetupRoom({
   isOpen,
   onJoinCall,
   onClose,
   meetingInfo,
+  callSettings,
+  setCallSettings,
 }: PreCallSetupRoomProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [settings, setSettings] = useState<CallSettings>({
-    camera: { enabled: true, deviceId: 'default', resolution: '720p' },
-    microphone: { enabled: true, deviceId: 'default', volume: 80 },
-    speaker: { deviceId: 'default', volume: 70 },
-    displayName: 'John Doe',
-    backgroundBlur: false,
-  });
 
   const [devices, setDevices] = useState<Devices>({
     cameras: [],
@@ -47,12 +52,47 @@ export function PreCallSetupRoom({
     speakers: [],
   });
 
+  const [deviceAvailability, setDeviceAvailability] =
+    useState<DeviceAvailability>({
+      hasCamera: false,
+      hasMicrophone: false,
+      hasSpeaker: false,
+    });
+
   const [audioLevel, setAudioLevel] = useState(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isLoadingDevices, setIsLoadingDevices] = useState(true);
+  const [deviceError, setDeviceError] = useState<string | null>(null);
+
+  const refreshDevices = async () => {
+    setIsLoadingDevices(true);
+    setDeviceError(null);
+
+    try {
+      const availability = await checkDeviceAvailability();
+      setDeviceAvailability(availability);
+
+      const deviceList = await getMediaDevices();
+      setDevices(deviceList);
+
+      if (!availability.hasCamera && !availability.hasMicrophone) {
+        setDeviceError(
+          'No camera or microphone devices detected. Please check your device connections and browser permissions.'
+        );
+      }
+    } catch (error) {
+      console.error('Error refreshing devices:', error);
+      setDeviceError(
+        error instanceof Error ? error.message : 'Failed to refresh devices'
+      );
+    } finally {
+      setTimeout(() => setIsLoadingDevices(false), 1000);
+    }
+  };
 
   // Use the device testing hook
   const { testResults, isTestingDevices, runDeviceTests } =
-    useDeviceTesting(settings);
+    useDeviceTesting(callSettings);
 
   const steps: Step[] = [
     { title: 'Camera & Microphone', icon: Camera },
@@ -61,56 +101,62 @@ export function PreCallSetupRoom({
     { title: 'Ready to Join', icon: CheckCircle },
   ];
 
-  // Mock device enumeration
+  // Device enumeration and availability checking
   useEffect(() => {
-    getMediaDevices().then((devices: Devices) => {
-      console.log('devices', devices);
-      setDevices(devices);
-      const currentStream = localMediaStreamsStore.getLocalMediaStreams()[0];
-      setStream(currentStream);
-    });
-    // setDevices({
-    //   cameras: [
-    //     { deviceId: 'default', label: 'Default Camera', kind: 'videoinput' },
-    //     { deviceId: 'hd-webcam', label: 'HD Webcam', kind: 'videoinput' },
-    //     {
-    //       deviceId: 'integrated-camera',
-    //       label: 'Integrated Camera',
-    //       kind: 'videoinput',
-    //     },
-    //   ],
-    //   microphones: [
-    //     {
-    //       deviceId: 'default',
-    //       label: 'Default Microphone',
-    //       kind: 'audioinput',
-    //     },
-    //     { deviceId: 'usb-mic', label: 'USB Microphone', kind: 'audioinput' },
-    //     {
-    //       deviceId: 'built-in-mic',
-    //       label: 'Built-in Microphone',
-    //       kind: 'audioinput',
-    //     },
-    //   ],
-    //   speakers: [
-    //     { deviceId: 'default', label: 'Default Speakers', kind: 'audiooutput' },
-    //     {
-    //       deviceId: 'headphones',
-    //       label: 'Bluetooth Headphones',
-    //       kind: 'audiooutput',
-    //     },
-    //     {
-    //       deviceId: 'built-in-speakers',
-    //       label: 'Built-in Speakers',
-    //       kind: 'audiooutput',
-    //     },
-    //   ],
-    // });
+    const initializeDevices = async () => {
+      setIsLoadingDevices(true);
+      setDeviceError(null);
+
+      try {
+        // Check device availability first
+        const availability = await checkDeviceAvailability();
+        setDeviceAvailability(availability);
+
+        // Get device list
+        const deviceList = await getMediaDevices();
+        setDevices(deviceList);
+
+        // Update settings based on availability
+        setCallSettings((prev) => ({
+          ...prev,
+          camera: {
+            ...prev.camera,
+            enabled: availability.hasCamera && prev.camera.enabled,
+          },
+          microphone: {
+            ...prev.microphone,
+            enabled: availability.hasMicrophone && prev.microphone.enabled,
+          },
+        }));
+
+        // Get current stream if available
+        const currentStream = localMediaStreamsStore.getLocalMediaStreams()[0];
+        setStream(currentStream);
+
+        // Check if we have any devices at all
+        if (!availability.hasCamera && !availability.hasMicrophone) {
+          setDeviceError(
+            'No camera or microphone devices detected. Please check your device connections and browser permissions.'
+          );
+        }
+      } catch (error) {
+        console.error('Error initializing devices:', error);
+        setDeviceError(
+          error instanceof Error
+            ? error.message
+            : 'Failed to initialize devices'
+        );
+      } finally {
+        setTimeout(() => setIsLoadingDevices(false), 1000);
+      }
+    };
+
+    initializeDevices();
   }, []);
 
   // Simulate audio level monitoring
   useEffect(() => {
-    if (settings.microphone.enabled && stream) {
+    if (callSettings.microphone.enabled && stream) {
       const stopMonitoring = monitorAudioLevel({
         stream,
         onLevelChange: setAudioLevel,
@@ -121,7 +167,7 @@ export function PreCallSetupRoom({
     } else {
       setAudioLevel(0);
     }
-  }, [settings.microphone.enabled, stream]);
+  }, [callSettings.microphone.enabled, stream]);
 
   if (!isOpen) return null;
 
@@ -134,7 +180,7 @@ export function PreCallSetupRoom({
         className="bg-gray-900 rounded-2xl border border-gray-700 w-full max-w-4xl h-[80vh] flex overflow-hidden"
       >
         {/* Left sidebar - Meeting info and progress */}
-        <div className="w-80 bg-gray-800/50 p-6 flex flex-col">
+        <div className="w-80 flex-shrink-0 bg-gray-800/50 p-6 flex flex-col">
           <div className="mb-6">
             <h2 className="text-white text-xl mb-2">Join Meeting</h2>
             <div className="space-y-2 text-gray-300">
@@ -209,9 +255,12 @@ export function PreCallSetupRoom({
             <div className="flex items-center justify-between">
               <Label className="text-gray-300 text-sm">Background Blur</Label>
               <Switch
-                checked={settings.backgroundBlur}
+                checked={callSettings.backgroundBlur}
                 onCheckedChange={(checked: boolean) =>
-                  setSettings((prev) => ({ ...prev, backgroundBlur: checked }))
+                  setCallSettings((prev) => ({
+                    ...prev,
+                    backgroundBlur: checked,
+                  }))
                 }
               />
             </div>
@@ -219,7 +268,7 @@ export function PreCallSetupRoom({
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
           <div className="p-6 border-b border-gray-700 flex items-center justify-between">
             <h3 className="text-white text-lg">{steps[currentStep].title}</h3>
@@ -229,21 +278,47 @@ export function PreCallSetupRoom({
           </div>
 
           {/* Step content */}
-          <div className="flex-1 p-6 overflow-auto">
+          <div className="flex-1 min-w-0 p-6 overflow-auto overflow-x-hidden">
+            {/* Device Error Display */}
+            {deviceError && (
+              <div className="mb-6 bg-red-600/20 border border-red-600/50 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm flex-1">
+                    <p className="text-red-400 font-medium mb-1">
+                      Device Setup Error
+                    </p>
+                    <p className="text-red-300 mb-3">{deviceError}</p>
+                    <Button
+                      onClick={refreshDevices}
+                      variant="outline"
+                      size="sm"
+                      disabled={isLoadingDevices}
+                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                    >
+                      {isLoadingDevices ? 'Refreshing...' : 'Refresh Devices'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <AnimatePresence mode="wait">
               {currentStep === 0 && (
                 <Step0CameraMic
-                  settings={settings}
-                  setSettings={setSettings}
+                  settings={callSettings}
+                  setSettings={setCallSettings}
                   devices={devices}
                   audioLevel={audioLevel}
+                  deviceAvailability={deviceAvailability}
+                  isLoadingDevices={isLoadingDevices}
                 />
               )}
 
               {currentStep === 1 && (
                 <Step1AudioSettings
-                  settings={settings}
-                  setSettings={setSettings}
+                  settings={callSettings}
+                  setSettings={setCallSettings}
                   devices={devices}
                   audioLevel={audioLevel}
                 />
@@ -258,7 +333,11 @@ export function PreCallSetupRoom({
               )}
 
               {currentStep === 3 && (
-                <Step3ReadyToJoin settings={settings} onJoinCall={onJoinCall} />
+                <Step3ReadyToJoin
+                  settings={callSettings}
+                  onJoinCall={onJoinCall}
+                  deviceAvailability={deviceAvailability}
+                />
               )}
             </AnimatePresence>
           </div>
@@ -291,7 +370,7 @@ export function PreCallSetupRoom({
             <Button
               onClick={() => {
                 if (currentStep === steps.length - 1) {
-                  onJoinCall(settings);
+                  onJoinCall(callSettings);
                 } else {
                   setCurrentStep(Math.min(steps.length - 1, currentStep + 1));
                 }

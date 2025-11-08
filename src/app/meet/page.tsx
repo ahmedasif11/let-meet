@@ -1,7 +1,12 @@
 'use client';
 
-import { VideoCallRoom } from '@/components/meet/VideoCallRoom';
+import { VideoCallRoom } from '@/components/meet/index';
+import { StoreProvider } from '@/context/store-provider';
 
 export default function MeetPage() {
-  return <VideoCallRoom />;
+  return (
+    <StoreProvider>
+      <VideoCallRoom />
+    </StoreProvider>
+  );
 }

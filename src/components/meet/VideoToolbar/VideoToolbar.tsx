@@ -49,14 +49,15 @@ export function VideoToolbar({
   onToggleAdvancedAudio,
   onToggleAudio,
   onToggleVideo,
+  onToggleScreenShare,
   unreadMessages = 0,
   isHandRaised = false,
   isRecording = false,
   isAudioOn = true,
   isVideoOn = true,
+  isScreenSharing = false,
   className = '',
 }: VideoToolbarProps) {
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
   const [showMoreControls, setShowMoreControls] = useState(false);
 
@@ -72,6 +73,12 @@ export function VideoToolbar({
     }
   };
 
+  const handleScreenShareToggle = () => {
+    if (onToggleScreenShare) {
+      onToggleScreenShare();
+    }
+  };
+
   const handleReaction = (reaction: string) => {
     onSendReaction(reaction);
     setShowReactions(false);
@@ -80,10 +87,10 @@ export function VideoToolbar({
   return (
     <TooltipProvider>
       <div
-        className={`relative flex items-center justify-between gap-2 p-4 bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/10 ${className}`}
+        className={`relative flex items-center justify-between gap-6 p-4 bg-slate-800/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl ${className}`}
       >
         {/* Left controls - Communication */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Audio toggle */}
           <Tooltip>
             <TooltipTrigger asChild>
@@ -91,7 +98,7 @@ export function VideoToolbar({
                 variant={isAudioOn ? 'secondary' : 'destructive'}
                 size="icon"
                 onClick={handleAudioToggle}
-                className="rounded-full w-12 h-12 relative"
+                className="rounded-full w-12 h-12 relative hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
               >
                 {isAudioOn ? (
                   <Mic className="w-5 h-5" />
@@ -110,7 +117,7 @@ export function VideoToolbar({
                 variant={isVideoOn ? 'secondary' : 'destructive'}
                 size="icon"
                 onClick={handleVideoToggle}
-                className="rounded-full w-12 h-12"
+                className="rounded-full w-12 h-12 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
               >
                 {isVideoOn ? (
                   <Video className="w-5 h-5" />
@@ -130,8 +137,8 @@ export function VideoToolbar({
               <Button
                 variant={isScreenSharing ? 'default' : 'secondary'}
                 size="icon"
-                onClick={() => setIsScreenSharing(!isScreenSharing)}
-                className="rounded-full w-12 h-12"
+                onClick={handleScreenShareToggle}
+                className="rounded-full w-12 h-12 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
               >
                 {isScreenSharing ? (
                   <MonitorOff className="w-5 h-5" />
@@ -156,9 +163,9 @@ export function VideoToolbar({
                   variant="secondary"
                   size="icon"
                   onClick={() => setShowReactions(!showReactions)}
-                  className="rounded-full w-12 h-12"
+                  className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
                 >
-                  <Smile className="w-5 h-5" />
+                  <Smile className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Reactions</TooltipContent>
@@ -170,7 +177,7 @@ export function VideoToolbar({
                   initial={{ opacity: 0, y: 20, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                  className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-2xl p-3 shadow-2xl border border-white/10"
+                  className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800/95 backdrop-blur-xl rounded-2xl p-3 shadow-2xl border border-white/10"
                 >
                   <div className="flex gap-2">
                     {reactions.map((reaction, index) => (
@@ -180,7 +187,7 @@ export function VideoToolbar({
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.05 }}
                         onClick={() => handleReaction(reaction)}
-                        className="text-2xl hover:scale-110 transition-transform p-1 rounded-lg hover:bg-white/10"
+                        className="text-2xl hover:scale-110 transition-transform p-2 rounded-lg hover:bg-white/10"
                       >
                         {reaction}
                       </motion.button>
@@ -199,9 +206,9 @@ export function VideoToolbar({
                   variant="secondary"
                   size="icon"
                   onClick={onToggleVirtualBackgrounds}
-                  className="rounded-full w-12 h-12"
+                  className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
                 >
-                  <Palette className="w-5 h-5" />
+                  <Palette className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Virtual Backgrounds</TooltipContent>
@@ -216,9 +223,9 @@ export function VideoToolbar({
                   variant="secondary"
                   size="icon"
                   onClick={onToggleCallQuality}
-                  className="rounded-full w-12 h-12"
+                  className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
                 >
-                  <Activity className="w-5 h-5" />
+                  <Activity className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Call Quality</TooltipContent>
@@ -233,9 +240,9 @@ export function VideoToolbar({
                   variant="secondary"
                   size="icon"
                   onClick={onToggleMeetingNotes}
-                  className="rounded-full w-12 h-12"
+                  className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
                 >
-                  <FileText className="w-5 h-5" />
+                  <FileText className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Meeting Notes</TooltipContent>
@@ -250,9 +257,9 @@ export function VideoToolbar({
                   variant="secondary"
                   size="icon"
                   onClick={onToggleAdvancedAudio}
-                  className="rounded-full w-12 h-12"
+                  className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Advanced Audio</TooltipContent>
@@ -266,9 +273,9 @@ export function VideoToolbar({
                 variant={isHandRaised ? 'default' : 'secondary'}
                 size="icon"
                 onClick={onRaiseHand}
-                className="rounded-full w-12 h-12 relative"
+                className="rounded-full w-10 h-10 relative hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
               >
-                <Hand className="w-5 h-5" />
+                <Hand className="w-4 h-4" />
                 {isHandRaised && (
                   <motion.div
                     animate={{ scale: [1, 1.2, 1] }}
@@ -290,11 +297,11 @@ export function VideoToolbar({
                 variant="secondary"
                 size="icon"
                 onClick={onToggleChat}
-                className="rounded-full w-12 h-12 relative"
+                className="rounded-full w-10 h-10 relative hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
               >
-                <MessageSquare className="w-5 h-5" />
+                <MessageSquare className="w-4 h-4" />
                 {unreadMessages > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center text-xs bg-red-600">
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-red-600">
                     {unreadMessages > 9 ? '9+' : unreadMessages}
                   </Badge>
                 )}
@@ -304,21 +311,6 @@ export function VideoToolbar({
               Chat {unreadMessages > 0 && `(${unreadMessages})`}
             </TooltipContent>
           </Tooltip>
-        </div>
-
-        {/* Right controls - Management */}
-        <div className="flex items-center gap-2">
-          {/* Recording indicator */}
-          {isRecording && (
-            <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="flex items-center gap-2 px-3 py-2 bg-red-600 rounded-full"
-            >
-              <Circle className="w-4 h-4 text-white fill-current" />
-              <span className="text-white text-sm">REC</span>
-            </motion.div>
-          )}
 
           {/* Participants */}
           <Tooltip>
@@ -327,9 +319,9 @@ export function VideoToolbar({
                 variant="secondary"
                 size="icon"
                 onClick={onToggleParticipants}
-                className="rounded-full w-12 h-12"
+                className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
               >
-                <Users className="w-5 h-5" />
+                <Users className="w-4 h-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Participants</TooltipContent>
@@ -343,9 +335,9 @@ export function VideoToolbar({
                   variant="secondary"
                   size="icon"
                   onClick={() => setShowMoreControls(!showMoreControls)}
-                  className="rounded-full w-12 h-12"
+                  className="rounded-full w-10 h-10 hover:scale-105 transition-transform bg-slate-700 hover:bg-slate-600"
                 >
-                  <MoreHorizontal className="w-5 h-5" />
+                  <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>More</TooltipContent>
@@ -357,12 +349,12 @@ export function VideoToolbar({
                   initial={{ opacity: 0, y: 20, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                  className="absolute bottom-16 right-0 bg-gray-800 rounded-xl p-2 shadow-2xl border border-white/10 min-w-48"
+                  className="absolute bottom-16 right-0 bg-gray-800/95 backdrop-blur-xl rounded-xl p-2 shadow-2xl border border-white/10 min-w-48"
                 >
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start gap-3"
+                    className="w-full justify-start gap-3 hover:bg-white/10"
                   >
                     <Settings className="w-4 h-4" />
                     Settings
@@ -370,7 +362,7 @@ export function VideoToolbar({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start gap-3"
+                    className="w-full justify-start gap-3 hover:bg-white/10"
                   >
                     <Circle className="w-4 h-4" />
                     {isRecording ? 'Stop recording' : 'Start recording'}
@@ -378,7 +370,7 @@ export function VideoToolbar({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start gap-3"
+                    className="w-full justify-start gap-3 hover:bg-white/10"
                   >
                     <Maximize className="w-4 h-4" />
                     Fullscreen
@@ -386,7 +378,7 @@ export function VideoToolbar({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start gap-3"
+                    className="w-full justify-start gap-3 hover:bg-white/10"
                   >
                     <Grid3X3 className="w-4 h-4" />
                     Layout
@@ -395,7 +387,7 @@ export function VideoToolbar({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full justify-start gap-3"
+                      className="w-full justify-start gap-3 hover:bg-white/10"
                       onClick={onTogglePictureInPicture}
                     >
                       <Minimize2 className="w-4 h-4" />
@@ -406,6 +398,21 @@ export function VideoToolbar({
               )}
             </AnimatePresence>
           </div>
+        </div>
+
+        {/* Right controls - Management */}
+        <div className="flex items-center gap-3">
+          {/* Recording indicator */}
+          {isRecording && (
+            <motion.div
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="flex items-center gap-2 px-3 py-2 bg-red-600 rounded-full"
+            >
+              <Circle className="w-3 h-3 text-white fill-current" />
+              <span className="text-white text-sm font-medium">REC</span>
+            </motion.div>
+          )}
 
           {/* End call */}
           <Tooltip>
@@ -414,7 +421,7 @@ export function VideoToolbar({
                 variant="destructive"
                 size="icon"
                 onClick={onEndCall}
-                className="rounded-full bg-red-600 hover:bg-red-700 w-12 h-12 ml-2"
+                className="rounded-full bg-red-600 hover:bg-red-700 w-12 h-12 hover:scale-105 transition-transform"
               >
                 <Phone className="w-5 h-5" />
               </Button>

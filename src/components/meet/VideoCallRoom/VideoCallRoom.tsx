@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { VideoToolbar } from '../VideoToolbar';
 import { ChatPanel } from '../ChatPanel';
 import { ParticipantsPanel } from '../ParticipantsPanel';
@@ -14,12 +14,14 @@ import {
 import { MeetingNotesPanel } from '../MeetingNotesPanel';
 import { AdvancedAudioControls } from '../AdvancedAudioControls';
 import { PictureInPictureMode } from '../PictureInPictureMode';
-import { PreCallSetupRoom } from '../PreCallSteupRoom';
+import { PreCallSetupRoom } from '../PreCallSetupRoom';
 import { TopBar } from './components/TopBar';
 import { MainVideoArea } from './components/MainVideoArea';
 import { ConnectionStatusOverlay } from './components/ConnectionStatusOverlay';
 import { useVideoCallRoom } from './hooks/useVideoCallRoom';
 import { MeetingInfo, NotesMeetingInfo } from './types';
+import socket from '@/lib/sockets/socket';
+import { MeetNotification } from '../MeetNotification';
 
 export function VideoCallRoom() {
   const {
@@ -43,9 +45,14 @@ export function VideoCallRoom() {
     isPictureInPictureMode,
     isAudioOn,
     isVideoOn,
+    isScreenSharing,
     currentBackground,
     showPreCallFirst,
     audioSettings,
+    callSettings,
+    joiningCall,
+    admin,
+    pendingParticipants,
 
     // Setters
     setIsChatOpen,
@@ -62,6 +69,10 @@ export function VideoCallRoom() {
     setCurrentBackground,
     setShowPreCallFirst,
     setAudioSettings,
+    setCallSettings,
+    setJoiningCall,
+    setAdmin,
+    setPendingParticipants,
 
     // Handlers
     handleEndCall,
@@ -80,8 +91,13 @@ export function VideoCallRoom() {
     handleAudioSettingsChange,
     handleToggleAudio,
     handleToggleVideo,
+    handleToggleScreenShare,
     participantCount,
     isFullscreen,
+    handleJoiningAccepted,
+    handleJoinedAsAdmin,
+    onRequestAccepted,
+    onRequestRejected,
   } = useVideoCallRoom();
 
   // Mock meeting info for PreCallSetupRoom
@@ -99,8 +115,18 @@ export function VideoCallRoom() {
     participants: activeParticipants.map((p) => p.name),
   };
 
+  if (joiningCall) {
+    return (
+      <div>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+          <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white flex flex-col overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col overflow-hidden">
       {/* Top bar */}
       <TopBar
         callDuration={callDuration}
@@ -134,27 +160,32 @@ export function VideoCallRoom() {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="p-4"
+        className="px-6 py-4"
       >
-        <VideoToolbar
-          onEndCall={handleEndCall}
-          onToggleChat={handleToggleChat}
-          onToggleParticipants={handleToggleParticipants}
-          onRaiseHand={handleRaiseHand}
-          onSendReaction={handleSendReaction}
-          onToggleVirtualBackgrounds={toggleVirtualBackgrounds}
-          onToggleCallQuality={toggleCallQuality}
-          onToggleMeetingNotes={toggleMeetingNotes}
-          onTogglePictureInPicture={handleTogglePictureInPicture}
-          onToggleAdvancedAudio={toggleAdvancedAudio}
-          unreadMessages={unreadMessages}
-          isHandRaised={isHandRaised}
-          isRecording={isRecording}
-          isAudioOn={isAudioOn}
-          isVideoOn={isVideoOn}
-          onToggleAudio={handleToggleAudio}
-          onToggleVideo={handleToggleVideo}
-        />
+        <div className="flex justify-center">
+          <VideoToolbar
+            onEndCall={handleEndCall}
+            onToggleChat={handleToggleChat}
+            onToggleParticipants={handleToggleParticipants}
+            onRaiseHand={handleRaiseHand}
+            onSendReaction={handleSendReaction}
+            onToggleVirtualBackgrounds={toggleVirtualBackgrounds}
+            onToggleCallQuality={toggleCallQuality}
+            onToggleMeetingNotes={toggleMeetingNotes}
+            onTogglePictureInPicture={handleTogglePictureInPicture}
+            onToggleAdvancedAudio={toggleAdvancedAudio}
+            unreadMessages={unreadMessages}
+            isHandRaised={isHandRaised}
+            isRecording={isRecording}
+            isAudioOn={isAudioOn}
+            isVideoOn={isVideoOn}
+            isScreenSharing={isScreenSharing}
+            onToggleAudio={handleToggleAudio}
+            onToggleVideo={handleToggleVideo}
+            onToggleScreenShare={handleToggleScreenShare}
+            className="max-w-4xl w-full"
+          />
+        </div>
       </motion.div>
 
       {/* Side panels */}
@@ -211,6 +242,8 @@ export function VideoCallRoom() {
           onJoinCall={handleJoinCall}
           onClose={() => setShowPreCallFirst(false)}
           meetingInfo={preCallMeetingInfo}
+          callSettings={callSettings}
+          setCallSettings={setCallSettings}
         />
       )}
 
@@ -229,6 +262,28 @@ export function VideoCallRoom() {
 
       {/* Connection status overlay */}
       <ConnectionStatusOverlay connectionStatus={connectionStatus} />
+
+      {/* Fixed notifications rendering */}
+      <AnimatePresence>
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 space-y-4">
+          {admin &&
+            pendingParticipants.length > 0 &&
+            pendingParticipants.map((participant) => (
+              <MeetNotification
+                key={participant.id}
+                isOpen={true}
+                participant={participant}
+                onAccept={() => onRequestAccepted(participant)}
+                onReject={() => onRequestRejected(participant)}
+                onClose={() => {
+                  setPendingParticipants((prev) =>
+                    prev.filter((p) => p.id !== participant.id)
+                  );
+                }}
+              />
+            ))}
+        </div>
+      </AnimatePresence>
     </div>
   );
 }

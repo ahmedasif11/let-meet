@@ -1,7 +1,6 @@
 import React from 'react';
 import { ParticipantVideo } from '../ParticipantVideo';
 import { ParticipantGridProps } from './types';
-import { getGridClasses, getParticipantSize } from './utils';
 
 export function ParticipantGrid({
   participants,
@@ -9,35 +8,97 @@ export function ParticipantGrid({
 }: ParticipantGridProps) {
   const count = participants.length;
 
-  // Special layout for 3 participants
-  const renderThreeParticipants = () => (
-    <>
-      <ParticipantVideo
-        participant={participants[0]}
-        className="col-span-2 h-48 md:h-64"
-      />
-      <ParticipantVideo
-        participant={participants[1]}
-        className="h-32 md:h-48"
-      />
-      <ParticipantVideo
-        participant={participants[2]}
-        className="h-32 md:h-48"
-      />
-    </>
-  );
+  // For 5+ participants, show 2x2 main grid with sidebar
+  if (count > 4) {
+    const mainParticipants = participants.slice(0, 4);
+    const sidebarParticipants = participants.slice(4);
 
-  return (
-    <div className={`grid gap-2 md:gap-4 h-full ${getGridClasses(count)}`}>
-      {count === 3
-        ? renderThreeParticipants()
-        : participants.map((participant, index) => (
+    return (
+      <div className="flex h-full gap-4">
+        {/* Main 2x2 Grid */}
+        <div className="flex-1 grid grid-cols-2 gap-4">
+          {mainParticipants.map((participant, index) => (
             <ParticipantVideo
               key={participant.id}
               participant={participant}
-              className={getParticipantSize(count)}
+              className="w-full h-full"
             />
           ))}
+        </div>
+
+        {/* Sidebar for additional participants */}
+        <div className="w-80 flex flex-col gap-3">
+          <div className="text-sm text-gray-400 mb-2 px-2">
+            +{sidebarParticipants.length} more participants
+          </div>
+          {sidebarParticipants.map((participant, index) => (
+            <ParticipantVideo
+              key={participant.id}
+              participant={participant}
+              className="w-full aspect-video"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Responsive layouts for 1-4 participants
+  if (count === 1) {
+    return (
+      <div className="h-full w-full">
+        <ParticipantVideo
+          participant={participants[0]}
+          className="w-full h-full"
+        />
+      </div>
+    );
+  }
+
+  if (count === 2) {
+    return (
+      <div className="grid grid-cols-2 gap-4 h-full">
+        {participants.map((participant, index) => (
+          <ParticipantVideo
+            key={participant.id}
+            participant={participant}
+            className="w-full h-full"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (count === 3) {
+    return (
+      <div className="grid grid-cols-3 gap-4 h-full">
+        {/* All three users get equal space in a row */}
+        <ParticipantVideo
+          participant={participants[0]}
+          className="w-full h-full"
+        />
+        <ParticipantVideo
+          participant={participants[1]}
+          className="w-full h-full"
+        />
+        <ParticipantVideo
+          participant={participants[2]}
+          className="w-full h-full"
+        />
+      </div>
+    );
+  }
+
+  // For 4 participants, use 2x2 grid
+  return (
+    <div className="grid grid-cols-2 gap-4 h-full">
+      {participants.map((participant, index) => (
+        <ParticipantVideo
+          key={participant.id}
+          participant={participant}
+          className="w-full h-full"
+        />
+      ))}
     </div>
   );
 }

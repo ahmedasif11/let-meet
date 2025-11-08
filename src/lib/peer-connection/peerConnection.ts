@@ -60,9 +60,16 @@ class PeerConnection {
       console.log('ICE gathering state:', this.peer?.iceGatheringState);
     };
 
-    // Optimize for better performance
+    // Optimize for better performance and reduce error logging
     this.peer.onicecandidateerror = (event) => {
-      console.warn('ICE candidate error:', event);
+      // Only log critical ICE errors, not all candidate failures
+      if (event.errorCode && event.errorCode !== 701) {
+        console.warn('ICE candidate error:', {
+          errorCode: event.errorCode,
+          errorText: event.errorText,
+          url: event.url,
+        });
+      }
     };
   }
 

@@ -1,31 +1,21 @@
 export const WebRTCConfig = {
   iceServers: [
+    // Primary STUN servers (more reliable)
     {
-      urls: [
-        'stun:stun.l.google.com:19302',
-        'stun:stun1.l.google.com:19302',
-        'stun:stun2.l.google.com:19302',
-        'stun:stun3.l.google.com:19302',
-        'stun:stun4.l.google.com:19302',
-      ],
+      urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'],
     },
+    // Free TURN servers (remove problematic ones)
     {
-      urls: [
-        'turn:openrelay.metered.ca:80',
-        'turn:openrelay.metered.ca:443',
-        'turn:openrelay.metered.ca:443?transport=tcp',
-      ],
+      urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443'],
       username: 'openrelayproject',
       credential: 'openrelayproject',
     },
+    // Remove Twilio TURN servers that are causing errors
+    // Add more reliable free TURN servers
     {
-      urls: [
-        'turn:global.turn.twilio.com:3478?transport=udp',
-        'turn:global.turn.twilio.com:3478?transport=tcp',
-        'turn:global.turn.twilio.com:443?transport=tcp',
-      ],
-      username: 'your_twilio_username',
-      credential: 'your_twilio_password',
+      urls: ['turn:relay.metered.ca:80', 'turn:relay.metered.ca:443'],
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
   ],
 
@@ -34,6 +24,8 @@ export const WebRTCConfig = {
     bundlePolicy: 'max-bundle' as RTCBundlePolicy,
     rtcpMuxPolicy: 'require' as RTCRtcpMuxPolicy,
     iceTransportPolicy: 'all' as RTCIceTransportPolicy,
+    // Add connection optimization settings
+    iceCandidateTimeout: 10000, // 10 seconds timeout for ICE candidates
   },
 
   mediaConstraints: {

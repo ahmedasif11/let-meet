@@ -11,10 +11,12 @@ export interface VideoToolbarProps {
   onToggleAdvancedAudio?: () => void;
   onToggleAudio?: () => void;
   onToggleVideo?: () => void;
+  onToggleScreenShare?: () => void;
   unreadMessages?: number;
   isHandRaised?: boolean;
   isRecording?: boolean;
   isAudioOn?: boolean;
   isVideoOn?: boolean;
+  isScreenSharing?: boolean;
   className?: string;
 }

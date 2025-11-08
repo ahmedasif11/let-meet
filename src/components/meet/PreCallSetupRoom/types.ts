@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface PreCallSetupRoomProps {
   isOpen: boolean;
   onJoinCall: (settings: CallSettings) => void;
@@ -8,6 +10,8 @@ export interface PreCallSetupRoomProps {
     participants: number;
     scheduledTime: Date;
   };
+  callSettings: CallSettings;
+  setCallSettings: React.Dispatch<React.SetStateAction<CallSettings>>;
 }
 
 export interface CallSettings {
@@ -48,7 +52,16 @@ export interface Devices {
   speakers: DeviceInfo[];
 }
 
+export interface DeviceAvailability {
+  hasCamera: boolean;
+  hasMicrophone: boolean;
+  hasSpeaker: boolean;
+  cameraError?: string;
+  microphoneError?: string;
+  speakerError?: string;
+}
+
 export interface Step {
   title: string;
-  icon: any; // Lucide icon component
+  icon: React.ComponentType<{ className?: string }>; // Lucide icon component
 }
