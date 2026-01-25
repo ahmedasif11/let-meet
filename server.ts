@@ -1,3 +1,8 @@
+// DEPRECATED: This file is no longer used.
+// Socket.io server has been moved to /socket-server
+// Next.js app now runs standalone and connects to the separate socket server via NEXT_PUBLIC_SOCKET_URL
+// This file is kept for reference only and can be deleted.
+
 // server.ts
 import express from 'express';
 import { createServer } from 'http';

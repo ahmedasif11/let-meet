@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx server.ts",
-    "dev:ts-node": "ts-node --esm server.ts",
+    "dev": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production node dist/server.js",
-    "lint": "next lint",
-    "ngrok": "ngrok http 3000"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",
