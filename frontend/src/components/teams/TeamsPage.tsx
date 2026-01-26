@@ -133,7 +133,7 @@ export function TeamsPage() {
     console.log('Joining team');
   };
 
-  const handleStartCall = (teamId: string) => {
+  const handleStartCall = () => {
     // Navigate to meet page - it will generate a unique room ID
     router.push('/meet');
   };
@@ -225,7 +225,7 @@ export function TeamsPage() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleStartCall(team.id);
+                          handleStartCall();
                         }}
                       >
                         <Phone className="h-4 w-4" />
@@ -335,7 +335,7 @@ export function TeamsPage() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
-                      <Button className="flex-1" onClick={() => handleStartCall(selectedTeam.id)}>
+                      <Button className="flex-1" onClick={handleStartCall}>
                         <Video className="h-4 w-4 mr-2" />
                         Start Team Call
                       </Button>

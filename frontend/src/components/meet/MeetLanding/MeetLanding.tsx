@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Video, Users, Link as LinkIcon, Copy, Check } from 'lucide-react';
+import { Video, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import generateRandomId from '@/lib/utils/generateRandomId';
 import { ThemeToggle } from '@/components/theme';
@@ -21,7 +21,6 @@ export function MeetLanding() {
   const router = useRouter();
   const [view, setView] = useState<View>('landing');
   const [roomIdInput, setRoomIdInput] = useState('');
-  const [copied, setCopied] = useState(false);
 
   const handleStartNewCall = () => {
     const newRoomId = generateRandomId();

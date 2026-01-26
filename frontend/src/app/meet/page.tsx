@@ -9,7 +9,6 @@ import { useSearchParams } from 'next/navigation';
 function MeetPageContent() {
   const searchParams = useSearchParams();
   const roomId = searchParams.get('roomId');
-  const action = searchParams.get('action');
 
   // Show landing page if no roomId
   if (!roomId) {
