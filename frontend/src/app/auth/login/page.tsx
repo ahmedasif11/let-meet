@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Video, Sun, Moon } from 'lucide-react';
+import { Video } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -77,7 +77,7 @@ function LoginForm() {
       } else if (result?.ok) {
         window.location.href = '/dashboard';
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

@@ -11,11 +11,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Video, Sun, Moon } from 'lucide-react';
+import { Video } from 'lucide-react';
 import Link from 'next/link';
 import { FaGithub } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { getBackendUrl } from '@/lib/utils/api';
 

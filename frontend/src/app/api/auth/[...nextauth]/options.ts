@@ -120,13 +120,13 @@ export const authOptions: NextAuthOptions = {
     },
 
     async signIn({ user, account, profile }) {
-      // For OAuth providers, create/update user in backend
       if (account && account.provider !== 'credentials') {
         try {
           const provider = account.provider;
           const email = user.email;
-          const name = user.name || (profile as any)?.name || '';
-          const avatar = user.image || (profile as any)?.picture || (profile as any)?.avatar_url || '';
+          const profileData = profile as { name?: string; picture?: string; avatar_url?: string } | undefined;
+          const name = user.name || profileData?.name || '';
+          const avatar = user.image || profileData?.picture || profileData?.avatar_url || '';
 
           if (!email || !name) {
             console.error('Missing email or name for OAuth user');

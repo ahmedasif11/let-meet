@@ -19,8 +19,6 @@ import {
   LogOut,
   Plus,
   Clock,
-  Sun,
-  Moon,
   Home,
   MessageSquare,
   Phone,

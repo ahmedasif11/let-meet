@@ -21,9 +21,8 @@ function VerifyEmailContent() {
   useEffect(() => {
     if (otpFromUrl) {
       setDevOtp(otpFromUrl);
-      // Auto-fill OTP if provided in URL (dev mode)
       const otpArray = otpFromUrl.split('').slice(0, 6);
-      const newOtp = [...otp];
+      const newOtp = Array(6).fill('');
       otpArray.forEach((digit, index) => {
         if (index < 6) newOtp[index] = digit;
       });

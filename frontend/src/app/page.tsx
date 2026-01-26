@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   Video,
@@ -17,7 +14,6 @@ import {
   ArrowRight,
   Play,
   Star,
-  CheckCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -32,7 +28,6 @@ export default function HomePage() {
       router.push('/dashboard');
     }
   }, [status, session, router]);
-  const [currentFeature, setCurrentFeature] = useState(0);
 
   const features = [
     {
