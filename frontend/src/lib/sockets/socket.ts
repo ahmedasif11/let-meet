@@ -66,7 +66,7 @@ function initSocket(): SocketType {
 
     socket.on('disconnect', (reason: string) => {
       console.log('Socket disconnected:', reason);
-      if (reason === 'io server disconnect') {
+      if (reason === 'io server disconnect' && socket) {
         // Server disconnected the socket, reconnect manually
         socket.connect();
       }
