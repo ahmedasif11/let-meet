@@ -22,6 +22,7 @@ import {
   Edit,
   Trash2,
   Users,
+  MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';

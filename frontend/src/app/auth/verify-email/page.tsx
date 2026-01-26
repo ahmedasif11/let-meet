@@ -7,6 +7,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { getBackendUrl } from '@/lib/utils/api';
+import { ThemeToggle } from '@/components/theme';
 
 function VerifyEmailContent() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);

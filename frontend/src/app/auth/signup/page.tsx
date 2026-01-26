@@ -18,6 +18,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { getBackendUrl } from '@/lib/utils/api';
+import { ThemeToggle } from '@/components/theme';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
