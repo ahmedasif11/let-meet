@@ -50,8 +50,9 @@ export const authOptions: NextAuthOptions = {
           }
 
           return data.user as unknown as User;
-        } catch (error: any) {
-          throw new Error(error.message || 'Failed to login');
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to login';
+          throw new Error(errorMessage);
         }
       },
     }),
