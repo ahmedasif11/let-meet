@@ -14,22 +14,18 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
   Video,
-  Calendar,
-  Users,
-  Settings,
-  LogOut,
   Plus,
-  Clock,
-  Home,
-  MessageSquare,
   Phone,
   Search,
   MoreVertical,
   UserPlus,
   Edit,
   Trash2,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface TeamMember {
   id: string;
@@ -52,12 +48,12 @@ interface Team {
 }
 
 export function TeamsPage() {
+  const { data: session } = useSession();
   const user = {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@gmail.com',
-    avatar:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
+    id: session?.user?._id || '1',
+    name: session?.user?.name || 'User',
+    email: session?.user?.email || '',
+    avatar: session?.user?.image || '',
   };
 
   const [teams] = useState<Team[]>([
@@ -124,6 +120,7 @@ export function TeamsPage() {
 
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   const handleCreateTeam = () => {
     // Handle team creation
@@ -136,8 +133,8 @@ export function TeamsPage() {
   };
 
   const handleStartCall = (teamId: string) => {
-    // Handle starting team call
-    console.log('Starting call for team:', teamId);
+    // Navigate to meet page - it will generate a unique room ID
+    router.push('/meet');
   };
 
   const filteredTeams = teams.filter(
@@ -147,78 +144,30 @@ export function TeamsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-card border-r border-border p-4">
-        <div className="flex items-center mb-8">
-          <Video className="h-8 w-8 text-blue-600 mr-2" />
-          <h1 className="text-xl font-semibold">VideoConnect</h1>
-        </div>
-
-        <nav className="space-y-2">
-          <Button variant="ghost" className="w-full justify-start" asChild>
-            <Link href="/dashboard">
-              <Home className="h-4 w-4 mr-2" />
-              Home
-            </Link>
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Calendar className="h-4 w-4 mr-2" />
-            Calendar
-          </Button>
-          <Button variant="default" className="w-full justify-start">
-            <Users className="h-4 w-4 mr-2" />
-            Teams
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
-          </Button>
-        </nav>
-
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center space-x-3 mb-4">
-            <Avatar src={user.avatar} alt={user.name} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user.name}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user.email}
+    <div className="min-h-screen bg-background p-4 sm:p-6">
+      <div className="container mx-auto max-w-7xl">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                <Users className="h-7 w-7 sm:h-8 sm:w-8 text-blue-600" />
+                Teams
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                Manage your teams and collaborate with members
               </p>
             </div>
-          </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="ml-64 p-6">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-3xl font-bold">Teams</h2>
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={handleJoinTeam}>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={handleJoinTeam} className="w-full sm:w-auto">
                 <UserPlus className="h-4 w-4 mr-2" />
                 Join Team
               </Button>
-              <Button onClick={handleCreateTeam}>
+              <Button onClick={handleCreateTeam} className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Team
               </Button>
             </div>
           </div>
-          <p className="text-muted-foreground">
-            Manage your teams and collaborate with members
-          </p>
         </div>
 
         {/* Search */}
@@ -384,14 +333,16 @@ export function TeamsPage() {
                       ))}
                     </div>
 
-                    <div className="flex space-x-2 pt-4 border-t">
-                      <Button className="flex-1">
+                    <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
+                      <Button className="flex-1" onClick={() => handleStartCall(selectedTeam.id)}>
                         <Video className="h-4 w-4 mr-2" />
                         Start Team Call
                       </Button>
-                      <Button variant="outline" className="flex-1">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Team Chat
+                      <Button variant="outline" className="flex-1" asChild>
+                        <Link href="/chat">
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Team Chat
+                        </Link>
                       </Button>
                     </div>
                   </div>

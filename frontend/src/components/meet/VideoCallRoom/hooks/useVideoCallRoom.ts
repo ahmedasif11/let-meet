@@ -27,6 +27,7 @@ import {
 } from '../../../../lib/call-controllers-functions/index';
 import { useRouter } from 'next/navigation';
 import screenShareStateStore from '@/lib/store/screenShareStore';
+import generateRandomId from '@/lib/utils/generateRandomId';
 
 export const useVideoCallRoom = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -59,7 +60,8 @@ export const useVideoCallRoom = () => {
     type: 'none',
     name: 'None',
   });
-  const [showPreCallFirst, setShowPreCallFirst] = useState(true);
+  const [showPreCallFirst, setShowPreCallFirst] = useState(false);
+  const [showCallInfo, setShowCallInfo] = useState(false);
   const [audioSettings, setAudioSettings] = useState({
     noiseSuppression: true,
     echoCancellation: true,
@@ -81,6 +83,7 @@ export const useVideoCallRoom = () => {
 
   const [joiningCall, setJoiningCall] = useState<boolean>(false);
   const [admin, setAdmin] = useState<boolean>(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
   const activeParticipants = participants;
   const screenSharingParticipant = activeParticipants.find(
     (p) => p.isScreenSharing
@@ -121,6 +124,37 @@ export const useVideoCallRoom = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Generate or get room ID from URL when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlRoomId = urlParams.get('roomId');
+      const action = urlParams.get('action');
+      
+      if (urlRoomId) {
+        setRoomId(urlRoomId);
+        
+        // If action is 'start', show call info screen first
+        if (action === 'start') {
+          setShowCallInfo(true);
+          console.log('Starting new call, showing call info:', urlRoomId);
+        } else {
+          // If joining, go directly to pre-call setup
+          setShowPreCallFirst(true);
+          console.log('Joining existing room from URL:', urlRoomId);
+        }
+      } else if (!roomId) {
+        // No room ID in URL - should not happen, but handle it
+        const newRoomId = generateRandomId();
+        setRoomId(newRoomId);
+        const newUrl = `${window.location.pathname}?roomId=${newRoomId}&action=start`;
+        window.history.replaceState({}, '', newUrl);
+        setShowCallInfo(true);
+        console.log('Generated new room ID:', newRoomId);
+      }
+    }
+  }, [roomId]);
 
   useEffect(() => {
     socket.on('joined-as-admin', handleJoinedAsAdmin);
@@ -246,6 +280,13 @@ export const useVideoCallRoom = () => {
 
   const handleJoinCall = useCallback((settings: CallSettings) => {
     console.log('Joining call: ', settings);
+    
+    // Use the generated room ID (should be set by useEffect on mount)
+    const currentRoomId = roomId || generateRandomId();
+    if (!roomId) {
+      setRoomId(currentRoomId);
+    }
+    
     const participant = {
       id: socket.id,
       name: settings.displayName,
@@ -253,10 +294,12 @@ export const useVideoCallRoom = () => {
       isVideoOn: settings.camera.enabled,
       isAudioOn: settings.microphone.enabled,
     };
-    console.log('Joining call: ', participant);
-    socket.emit('joining-request', { participant, roomId: '123' });
+    console.log('Joining call: ', participant, 'Room ID:', currentRoomId);
+    socket.emit('joining-request', { participant, roomId: currentRoomId });
     setJoiningCall(true);
-  }, []);
+    
+    // Stay on meet page - no redirect needed
+  }, [roomId]);
 
   const newUserConnected = useCallback((participant: Participant) => {
     setParticipants((prev) => [...prev, participant]);
@@ -469,7 +512,7 @@ export const useVideoCallRoom = () => {
     }
   }, [isScreenSharing]);
 
-  return {
+    return {
     // State
     participants,
     participantCount,
@@ -494,6 +537,7 @@ export const useVideoCallRoom = () => {
     isScreenSharing,
     currentBackground,
     showPreCallFirst,
+    showCallInfo,
     audioSettings,
     activeParticipants,
     screenSharingParticipant,
@@ -502,6 +546,7 @@ export const useVideoCallRoom = () => {
     joiningCall,
     admin,
     pendingParticipants,
+    roomId,
     // Setters
     setIsChatOpen,
     setIsParticipantsOpen,
@@ -518,6 +563,7 @@ export const useVideoCallRoom = () => {
     setIsAdvancedAudioOpen,
     setCurrentBackground,
     setShowPreCallFirst,
+    setShowCallInfo,
     setAudioSettings,
     setCallSettings,
     setJoiningCall,

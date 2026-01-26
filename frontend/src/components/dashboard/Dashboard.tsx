@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,15 +22,20 @@ import {
   Home,
   MessageSquare,
   Phone,
+  Menu,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+import { ThemeToggle } from '@/components/theme';
 
 export function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -108,33 +113,95 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border p-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Video className="h-6 w-6 text-blue-600" />
+          <h1 className="text-lg font-semibold">Let Meet</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
+      </div>
+
+      {/* Theme Toggle for Desktop - Top Right */}
+      <div className="hidden lg:block fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-card border-r border-border p-4">
+      <div
+        className={`fixed left-0 top-0 h-full w-64 bg-card border-r border-border p-4 z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
         <div className="flex items-center mb-8">
           <Video className="h-8 w-8 text-blue-600 mr-2" />
-          <h1 className="text-xl font-semibold">VideoConnect</h1>
+          <h1 className="text-xl font-semibold">Let Meet</h1>
         </div>
 
         <nav className="space-y-2">
-          <Button variant="default" className="w-full justify-start">
-            <Home className="h-4 w-4 mr-2" />
-            Home
+          <Button
+            variant={pathname === '/dashboard' ? 'default' : 'ghost'}
+            className="w-full justify-start"
+            asChild
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Link href="/dashboard">
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Calendar className="h-4 w-4 mr-2" />
-            Calendar
+          <Button
+            variant={pathname === '/calendar' ? 'default' : 'ghost'}
+            className="w-full justify-start"
+            asChild
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Link href="/calendar">
+              <Calendar className="h-4 w-4 mr-2" />
+              Calendar
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Users className="h-4 w-4 mr-2" />
-            Teams
+          <Button
+            variant={pathname?.startsWith('/teams') ? 'default' : 'ghost'}
+            className="w-full justify-start"
+            asChild
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Link href="/teams">
+              <Users className="h-4 w-4 mr-2" />
+              Teams
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat
+          <Button
+            variant={pathname === '/chat' ? 'default' : 'ghost'}
+            className="w-full justify-start"
+            asChild
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Link href="/chat">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Chat
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
+          <Button
+            variant={pathname === '/settings' ? 'default' : 'ghost'}
+            className="w-full justify-start"
+            asChild
+            onClick={() => setSidebarOpen(false)}
+          >
+            <Link href="/settings">
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </Link>
           </Button>
         </nav>
 
@@ -150,7 +217,7 @@ export function Dashboard() {
           </div>
           <Button
             variant="ghost"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4 mr-2" />
@@ -159,13 +226,21 @@ export function Dashboard() {
         </div>
       </div>
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className="ml-64 p-6">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">
+      <div className="lg:ml-64 pt-16 lg:pt-0 p-4 sm:p-6">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
             Welcome back, {user.name}!
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Here&apos;s what&apos;s happening with your calls today.
           </p>
         </div>
@@ -187,13 +262,17 @@ export function Dashboard() {
                     Start New Call
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Schedule Meeting
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/calendar">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Schedule Meeting
+                  </Link>
                 </Button>
-                <Button variant="outline" className="w-full">
-                  <Users className="h-4 w-4 mr-2" />
-                  Create Team
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/teams">
+                    <Users className="h-4 w-4 mr-2" />
+                    Create Team
+                  </Link>
                 </Button>
               </CardContent>
             </Card>

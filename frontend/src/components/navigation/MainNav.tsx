@@ -21,7 +21,7 @@ export function MainNav() {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Video className="h-8 w-8 text-blue-600" />
-          <span className="text-xl font-bold">VideoConnect</span>
+          <span className="text-xl font-bold">Let Meet</span>
         </div>
 
         <div className="hidden md:flex items-center space-x-6">

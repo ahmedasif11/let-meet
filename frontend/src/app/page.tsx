@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { ThemeToggle } from '@/components/theme';
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -66,7 +67,7 @@ export default function HomePage() {
       role: 'Product Manager',
       company: 'TechCorp',
       content:
-        'VideoConnect has transformed how our remote team collaborates. The video quality is exceptional and the team features are intuitive.',
+        'Let Meet has transformed how our remote team collaborates. The video quality is exceptional and the team features are intuitive.',
       rating: 5,
     },
     {
@@ -74,7 +75,7 @@ export default function HomePage() {
       role: 'Engineering Lead',
       company: 'StartupXYZ',
       content:
-        'We switched from multiple tools to VideoConnect and it streamlined our entire communication workflow. Highly recommended!',
+        'We switched from multiple tools to Let Meet and it streamlined our entire communication workflow. Highly recommended!',
       rating: 5,
     },
     {
@@ -103,7 +104,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Video className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold">VideoConnect</span>
+            <span className="text-xl font-bold">Let Meet</span>
           </div>
           <div className="hidden md:flex items-center space-x-6">
             <a
@@ -123,6 +124,7 @@ export default function HomePage() {
             </a>
           </div>
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <Button variant="ghost" asChild>
               <Link href="/auth/login">Sign In</Link>
             </Button>
@@ -251,7 +253,7 @@ export default function HomePage() {
               Loved by teams worldwide
             </h2>
             <p className="text-xl text-muted-foreground">
-              See what our users have to say about VideoConnect
+              See what our users have to say about Let Meet
             </p>
           </div>
 
@@ -290,7 +292,7 @@ export default function HomePage() {
             Ready to transform your team collaboration?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of teams already using VideoConnect
+            Join thousands of teams already using Let Meet
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
@@ -310,7 +312,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Video className="h-6 w-6 text-blue-600" />
-                <span className="text-lg font-bold">VideoConnect</span>
+                <span className="text-lg font-bold">Let Meet</span>
               </div>
               <p className="text-muted-foreground text-sm">
                 The ultimate video calling platform for modern teams.
@@ -393,7 +395,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 VideoConnect. All rights reserved.</p>
+            <p>&copy; 2024 Let Meet. All rights reserved.</p>
           </div>
         </div>
       </footer>

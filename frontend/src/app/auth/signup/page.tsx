@@ -102,7 +102,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md shadow-2xl border-0">
         <CardHeader className="text-center space-y-2 pb-4 px-4 sm:px-6 pt-6">
           <div className="flex items-center justify-center mb-3">
@@ -112,11 +115,11 @@ export default function SignupPage() {
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              VideoConnect
+              Let Meet
             </h1>
             <CardTitle className="text-xl sm:text-2xl mt-2">Create your account</CardTitle>
             <CardDescription className="text-sm sm:text-base">
-              Sign up to get started with VideoConnect
+              Sign up to get started with Let Meet
             </CardDescription>
           </div>
         </CardHeader>

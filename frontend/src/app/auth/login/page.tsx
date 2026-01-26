@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { redirect, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { ThemeToggle } from '@/components/theme';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -99,7 +100,10 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md shadow-2xl border-0">
         <CardHeader className="text-center space-y-2 pb-4 px-4 sm:px-6 pt-6">
           <div className="flex items-center justify-center mb-3">
@@ -109,7 +113,7 @@ function LoginForm() {
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              VideoConnect
+              Let Meet
             </h1>
             <CardTitle className="text-xl sm:text-2xl mt-2">Welcome back</CardTitle>
             <CardDescription className="text-sm sm:text-base">
@@ -266,7 +270,7 @@ export default function LoginPage() {
           <CardHeader className="text-center">
             <div className="flex items-center justify-center mb-4">
               <Video className="h-8 w-8 text-blue-600 mr-2" />
-              <h1 className="text-2xl font-semibold">VideoConnect</h1>
+              <h1 className="text-2xl font-semibold">Let Meet</h1>
             </div>
             <CardTitle>Loading...</CardTitle>
           </CardHeader>

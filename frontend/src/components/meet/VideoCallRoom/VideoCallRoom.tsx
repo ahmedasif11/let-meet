@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VideoToolbar } from '../VideoToolbar';
 import { ChatPanel } from '../ChatPanel';
@@ -18,12 +19,17 @@ import { PreCallSetupRoom } from '../PreCallSetupRoom';
 import { TopBar } from './components/TopBar';
 import { MainVideoArea } from './components/MainVideoArea';
 import { ConnectionStatusOverlay } from './components/ConnectionStatusOverlay';
+import { ShareRoomLink } from './components/ShareRoomLink';
+import { CallInfoScreen } from '../CallInfoScreen';
 import { useVideoCallRoom } from './hooks/useVideoCallRoom';
 import { MeetingInfo, NotesMeetingInfo } from './types';
 import socket from '@/lib/sockets/socket';
 import { MeetNotification } from '../MeetNotification';
 
 export function VideoCallRoom() {
+  const [isShareLinkOpen, setIsShareLinkOpen] = useState(false);
+  const router = useRouter();
+  
   const {
     // State
     activeParticipants,
@@ -48,11 +54,13 @@ export function VideoCallRoom() {
     isScreenSharing,
     currentBackground,
     showPreCallFirst,
+    showCallInfo,
     audioSettings,
     callSettings,
     joiningCall,
     admin,
     pendingParticipants,
+    roomId,
 
     // Setters
     setIsChatOpen,
@@ -68,6 +76,7 @@ export function VideoCallRoom() {
     setIsAdvancedAudioOpen,
     setCurrentBackground,
     setShowPreCallFirst,
+    setShowCallInfo,
     setAudioSettings,
     setCallSettings,
     setJoiningCall,
@@ -143,6 +152,7 @@ export function VideoCallRoom() {
         toggleAdvancedAudio={toggleAdvancedAudio}
         isFullscreen={isFullscreen}
         setIsFullscreen={setIsFullscreen}
+        onShareClick={() => setIsShareLinkOpen(true)}
       />
 
       {/* Main video area */}
@@ -235,6 +245,20 @@ export function VideoCallRoom() {
         onSettingsChange={handleAudioSettingsChange}
       />
 
+      {/* Call Info Screen - Shows before pre-call setup when starting new call */}
+      {showCallInfo && roomId && (
+        <CallInfoScreen
+          roomId={roomId}
+          onContinue={() => {
+            setShowCallInfo(false);
+            setShowPreCallFirst(true);
+          }}
+          onCancel={() => {
+            router.push('/meet');
+          }}
+        />
+      )}
+
       {/* Pre-call Setup Room */}
       {showPreCallFirst && (
         <PreCallSetupRoom
@@ -262,6 +286,15 @@ export function VideoCallRoom() {
 
       {/* Connection status overlay */}
       <ConnectionStatusOverlay connectionStatus={connectionStatus} />
+
+      {/* Share Room Link Modal */}
+      {roomId && (
+        <ShareRoomLink
+          roomId={roomId}
+          isOpen={isShareLinkOpen}
+          onClose={() => setIsShareLinkOpen(false)}
+        />
+      )}
 
       {/* Fixed notifications rendering */}
       <AnimatePresence>

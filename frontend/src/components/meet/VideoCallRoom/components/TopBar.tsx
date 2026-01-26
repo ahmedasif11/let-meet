@@ -13,6 +13,7 @@ import {
   Activity,
   FileText,
   Settings,
+  Share2,
 } from 'lucide-react';
 import { ConnectionStatus, LayoutMode } from '../types';
 import {
@@ -37,6 +38,7 @@ interface TopBarProps {
   toggleAdvancedAudio: () => void;
   isFullscreen: boolean;
   setIsFullscreen: (fullscreen: boolean) => void;
+  onShareClick: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -54,6 +56,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   toggleAdvancedAudio,
   isFullscreen,
   setIsFullscreen,
+  onShareClick,
 }) => {
   return (
     <motion.div
@@ -143,6 +146,16 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Global feature buttons */}
           <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onShareClick}
+              className="w-8 h-8 rounded-md hover:bg-slate-600/50"
+              title="Share Meeting Link"
+            >
+              <Share2 className="w-4 h-4" />
+            </Button>
+
             <Button
               variant="ghost"
               size="icon"
