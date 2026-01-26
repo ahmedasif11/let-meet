@@ -137,7 +137,7 @@ export function Dashboard() {
             Welcome back, {user.name}!
           </h2>
           <p className="text-muted-foreground">
-            Here's what's happening with your calls today.
+            Here&apos;s what&apos;s happening with your calls today.
           </p>
         </div>
 

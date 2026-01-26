@@ -1,4 +1,4 @@
-import { Note, ActionItem } from './types';
+import { Note, ActionItem, MeetingNotesPanelProps } from './types';
 
 export const extractTags = (text: string): string[] => {
   const tagRegex = /#(\w+)/g;
@@ -61,7 +61,7 @@ export const getPriorityColor = (priority: string) => {
 };
 
 export const exportNotes = (
-  meetingInfo: any,
+  meetingInfo: MeetingNotesPanelProps['meetingInfo'],
   callDuration: number,
   notes: Note[],
   actionItems: ActionItem[]

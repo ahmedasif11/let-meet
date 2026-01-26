@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import localMediaStreamsStore from '@/lib/store/localMeidaStreamsStore';
+import localMediaStreamsStore from '@/lib/store/localMediaStreamsStore';
 import cameraStateChangeStore from '@/lib/store/cameraStateChangeStore';
 import { setupMediaStream } from '@/lib/peer-connection/setUpMediaStream';
 import { toggleCamera, toggleMic } from '@/lib/call-controllers-functions';
@@ -32,8 +32,8 @@ export default function LocalVideo({ className }: { className: string }) {
         localVideoRef.current.srcObject = stream;
       }
       console.log('Local media stream setup successfully');
-    } catch (error: any) {
-      console.error('Failed to setup media:', error.message);
+    } catch (error: unknown) {
+      console.error('Failed to setup media:', error instanceof Error ? error.message : 'Unknown error');
     }
   }
 

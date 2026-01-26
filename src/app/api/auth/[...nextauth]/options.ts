@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           return user as unknown as User;
-        } catch (error) {
+        } catch {
           throw new Error('Failed to login');
         }
       },
@@ -66,9 +66,9 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
+      async jwt({ token, user }) {
       if (user) {
-        token._id = (user as any)._id?.toString();
+        token._id = (user as User & { _id?: { toString(): string } })._id?.toString();
         token.name = user.name;
         token.email = user.email;
         token.image = user.image || user.avatar;

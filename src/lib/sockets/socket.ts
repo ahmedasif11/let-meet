@@ -2,9 +2,11 @@ import io from 'socket.io-client';
 import { getSocketUrl } from '../utils/config';
 import WebRTCConfig from '../config/webrtc.config';
 
-let socket: any;
+type SocketType = ReturnType<typeof io>;
 
-function initSocket(): any {
+let socket: SocketType | null = null;
+
+function initSocket(): SocketType {
   if (!socket) {
     const socketUrl = getSocketUrl();
 
@@ -16,7 +18,7 @@ function initSocket(): any {
       console.log('Socket connected successfully');
     });
 
-    socket.on('connect_error', (error: any) => {
+    socket.on('connect_error', (error: Error) => {
       console.error('Socket connection error:', error);
     });
 

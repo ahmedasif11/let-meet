@@ -6,7 +6,7 @@ import LocalVideo from './local-video';
 import RemoteVideo from './remote-video';
 import socket from '../../../lib/sockets/socket';
 import remoteStreamsStore from '@/lib/store/remoteStreamsStore';
-import localMediaStreamsStore from '../../../lib/store/localMeidaStreamsStore';
+import localMediaStreamsStore from '../../../lib/store/localMediaStreamsStore';
 import Notification from './notification';
 
 import {

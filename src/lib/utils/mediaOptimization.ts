@@ -87,7 +87,7 @@ export class MediaOptimizer {
       setInterval(async () => {
         try {
           const stats = await peerConnection.getStats();
-          let totalBitrate = 0;
+          const totalBitrate = 0;
           let totalPacketsLost = 0;
 
           stats.forEach((report) => {

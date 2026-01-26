@@ -7,6 +7,7 @@ import {
   ConnectionStatus,
   CallSettings,
 } from '../types';
+import { AudioSettings } from '../../AdvancedAudioControls/types';
 import socket from '@/lib/sockets/socket';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/store/redux/store';
@@ -409,7 +410,7 @@ export const useVideoCallRoom = () => {
     setIsAdvancedAudioOpen(!isAdvancedAudioOpen);
   }, [isAdvancedAudioOpen]);
 
-  const handleAudioSettingsChange = useCallback((newSettings: any) => {
+  const handleAudioSettingsChange = useCallback((newSettings: AudioSettings) => {
     setAudioSettings(newSettings);
   }, []);
 
