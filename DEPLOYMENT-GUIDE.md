@@ -97,11 +97,14 @@ RESEND_API_KEY=your_resend_api_key_here
 
 ### 3.2 Configure Project
 
-1. **Root Directory**: Set to `frontend`
+**IMPORTANT**: In Vercel project settings, you MUST set:
+1. **Root Directory**: `frontend` (this is critical!)
 2. **Framework Preset**: Next.js (auto-detected)
-3. **Build Command**: `npm run build` (default)
+3. **Build Command**: `npm run build` (default - will run in frontend directory)
 4. **Output Directory**: `.next` (default)
-5. **Install Command**: `npm install` (default)
+5. **Install Command**: `npm install` (default - will run in frontend directory)
+
+**Note**: A `vercel.json` file has been added to the root to help with configuration, but you should still set the Root Directory in Vercel's dashboard to `frontend`.
 
 ### 3.3 Set Environment Variables
 
