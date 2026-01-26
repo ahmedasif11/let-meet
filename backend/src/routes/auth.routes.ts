@@ -33,9 +33,15 @@ router.post('/signup', async (req: Request, res: Response) => {
     const existingUser = await userModel.findOne({ email });
 
     if (existingUser?.isVerified) {
+      if (existingUser.provider && existingUser.provider !== 'credentials') {
+        return res.status(400).json({
+          success: false,
+          message: `This email is already registered with ${existingUser.provider}. Please use ${existingUser.provider} to sign in.`,
+        });
+      }
       return res.status(400).json({
         success: false,
-        message: 'Email already exists',
+        message: 'Email already exists. Please sign in instead.',
       });
     }
 
@@ -87,11 +93,20 @@ router.post('/signup', async (req: Request, res: Response) => {
     }
     const token = createVerificationToken(user._id.toString());
 
-    return res.status(201).json({
+    const responseData: any = {
       success: true,
       message: 'User created successfully',
       data: { token },
-    });
+    };
+
+    if (!process.env.RESEND_API_KEY || 
+        process.env.RESEND_API_KEY.trim() === '' || 
+        process.env.RESEND_API_KEY === 'your_resend_api_key_here') {
+      responseData.data.otp = otp;
+      responseData.message = 'User created successfully. Check console for OTP (dev mode).';
+    }
+
+    return res.status(201).json(responseData);
   } catch (error) {
     console.log('Signup error:', error);
     return res.status(500).json({
@@ -107,6 +122,13 @@ router.post('/verify-email', async (req: Request, res: Response) => {
     await connectToDB();
     const { token, otp } = req.body;
 
+    // Validate required fields
+    if (!token || !otp) {
+      return res.status(400).json({
+        error: 'Token and OTP are required',
+      });
+    }
+
     const secret = process.env.EMAIL_VERIFICATION_SECRET;
     if (!secret || secret === 'your_email_verification_secret_here') {
       return res.status(500).json({
@@ -114,10 +136,23 @@ router.post('/verify-email', async (req: Request, res: Response) => {
       });
     }
 
-    const decoded = jwt.verify(token, secret);
-    const { userId } = decoded as { userId: string };
+    let decoded: { userId: string };
+    try {
+      decoded = jwt.verify(token, secret) as { userId: string };
+    } catch (jwtError) {
+      console.error('JWT verification error:', jwtError);
+      return res.status(400).json({
+        error: 'Invalid or expired token',
+      });
+    }
 
-    const user = await userModel.findById(userId);
+    if (!decoded || !decoded.userId) {
+      return res.status(400).json({
+        error: 'Invalid token format',
+      });
+    }
+
+    const user = await userModel.findById(decoded.userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -128,7 +163,14 @@ router.post('/verify-email', async (req: Request, res: Response) => {
       });
     }
 
-    if (user.otp !== otp) {
+    // Check if OTP has expired
+    if (user.otpExpiresAt && user.otpExpiresAt < new Date()) {
+      return res.status(400).json({
+        error: 'OTP has expired. Please request a new one.',
+      });
+    }
+
+    if (!user.otp || user.otp !== otp) {
       return res.status(400).json({ error: 'Invalid OTP' });
     }
 
@@ -138,6 +180,7 @@ router.post('/verify-email', async (req: Request, res: Response) => {
     await user.save();
 
     return res.status(200).json({
+      success: true,
       message: 'Email verified successfully',
     });
   } catch (error) {
@@ -293,13 +336,32 @@ router.post('/oauth-user', async (req: Request, res: Response) => {
 
     if (existingUser) {
       // Update existing user if needed
+      let updated = false;
       if (!existingUser.avatar && avatar) {
         existingUser.avatar = avatar;
+        updated = true;
+      }
+      if (existingUser.provider !== provider) {
+        existingUser.provider = provider;
+        updated = true;
+      }
+      if (!existingUser.isVerified) {
+        existingUser.isVerified = true;
+        updated = true;
+      }
+      if (updated) {
         await existingUser.save();
       }
       return res.status(200).json({
         success: true,
         message: 'User already exists',
+        user: {
+          _id: existingUser._id.toString(),
+          name: existingUser.name,
+          email: existingUser.email,
+          avatar: existingUser.avatar || '',
+          provider: existingUser.provider,
+        },
       });
     }
 
@@ -317,6 +379,13 @@ router.post('/oauth-user', async (req: Request, res: Response) => {
     return res.status(201).json({
       success: true,
       message: 'OAuth user created successfully',
+      user: {
+        _id: newUser._id.toString(),
+        name: newUser.name,
+        email: newUser.email,
+        avatar: newUser.avatar || '',
+        provider: newUser.provider,
+      },
     });
   } catch (error) {
     console.error('OAuth user creation error:', error);

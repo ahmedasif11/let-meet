@@ -59,13 +59,22 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-      async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      // Initial sign in - set user data
       if (user) {
         token._id = (user as User & { _id?: { toString(): string } })._id?.toString();
         token.name = user.name;
         token.email = user.email;
-        token.image = user.image || user.avatar;
-        token.provider = user.provider;
+        token.image = user.image || (user as User & { avatar?: string }).avatar;
+        
+        // Determine provider from account or user object
+        if (account?.provider) {
+          token.provider = account.provider;
+        } else if ((user as User & { provider?: string }).provider) {
+          token.provider = (user as User & { provider?: string }).provider;
+        } else {
+          token.provider = 'credentials';
+        }
       }
       return token;
     },
@@ -73,53 +82,87 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user._id = token._id as string;
-        session.user.image = token.image as string;
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
-        session.user.provider = token.provider as string;
-      }
+        session.user.image = (token.image as string) || '';
+        session.user.name = (token.name as string) || '';
+        session.user.email = (token.email as string) || '';
+        session.user.provider = (token.provider as string) || 'credentials';
 
-      // Create or update user in backend for OAuth users
-      if (session.user.email && session.user.name && token.provider !== 'credentials') {
-        try {
-          await fetch(`${getBackendUrl()}/api/auth/oauth-user`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: session.user.email,
-              name: session.user.name,
-              avatar: session.user.image || '',
-              provider: token.provider,
-            }),
-          });
-        } catch (error) {
-          console.error('Error syncing OAuth user to backend:', error);
+        // For OAuth users, ensure they're synced to backend (retry if signIn callback failed)
+        if (token.provider && token.provider !== 'credentials' && session.user.email && session.user.name) {
+          try {
+            const response = await fetch(`${getBackendUrl()}/api/auth/oauth-user`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: session.user.email,
+                name: session.user.name,
+                avatar: session.user.image || '',
+                provider: token.provider,
+              }),
+            });
+
+            const data = await response.json();
+            if (response.ok && data.user?._id && !token._id) {
+              // Update token with user ID if we got it from backend
+              token._id = data.user._id;
+              session.user._id = data.user._id;
+            }
+          } catch (error) {
+            // Silently fail - user is already signed in
+            console.error('Error syncing OAuth user in session callback:', error);
+          }
         }
       }
 
       return session;
     },
 
-    async signIn({ user }) {
-      // For OAuth providers, create user in backend
-      if (user.provider && user.provider !== 'credentials') {
+    async signIn({ user, account, profile }) {
+      // For OAuth providers, create/update user in backend
+      if (account && account.provider !== 'credentials') {
         try {
-          await fetch(`${getBackendUrl()}/api/auth/oauth-user`, {
+          const provider = account.provider;
+          const email = user.email;
+          const name = user.name || (profile as any)?.name || '';
+          const avatar = user.image || (profile as any)?.picture || (profile as any)?.avatar_url || '';
+
+          if (!email || !name) {
+            console.error('Missing email or name for OAuth user');
+            // Still allow sign-in, but log the error
+            return true;
+          }
+
+          const response = await fetch(`${getBackendUrl()}/api/auth/oauth-user`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              email: user.email,
-              name: user.name,
-              avatar: user?.image || user?.avatar || '',
-              provider: user.provider,
+              email,
+              name,
+              avatar,
+              provider,
             }),
           });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error('Failed to create/update OAuth user:', data);
+            // Still allow sign-in, we'll try to sync in session callback
+            return true;
+          }
+
+          // Store user ID from backend response if available
+          if (data.user?._id) {
+            (user as User & { _id?: string })._id = data.user._id;
+          }
         } catch (error) {
           console.error('Error creating OAuth user in backend:', error);
+          // Still allow sign-in, we'll try to sync in session callback
+          return true;
         }
       }
       return true;

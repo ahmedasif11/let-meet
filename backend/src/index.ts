@@ -1,15 +1,52 @@
-// Main backend server entry point
+import dotenv from 'dotenv';
+import path from 'path';
+
+const possibleEnvPaths = [
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(__dirname, '../.env'),
+  path.resolve(__dirname, '../../.env'),
+  '.env',
+];
+
+let envLoaded = false;
+for (const envPath of possibleEnvPaths) {
+  try {
+    const result = dotenv.config({ path: envPath });
+    if (!result.error) {
+      console.log('✅ Environment variables loaded from:', envPath);
+      envLoaded = true;
+      break;
+    }
+  } catch (error) {
+    continue;
+  }
+}
+
+if (!envLoaded) {
+  console.warn('⚠️  Could not load .env file from any of the expected locations');
+  const result = dotenv.config();
+  if (result.error) {
+    console.warn('   Default location also failed:', result.error.message);
+  } else {
+    console.log('✅ Environment variables loaded from default location');
+  }
+}
+
+if (process.env.RESEND_API_KEY) {
+  const maskedKey = process.env.RESEND_API_KEY.length > 10 
+    ? process.env.RESEND_API_KEY.substring(0, 10) + '...' 
+    : '***';
+  console.log('✅ RESEND_API_KEY is set:', maskedKey);
+} else {
+  console.warn('⚠️  RESEND_API_KEY is not set in environment');
+}
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import connectToDB from './db/db.connect';
 import authRoutes from './routes/auth.routes';
 import { setupSocketIO } from './socket/socket.setup';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 // Railway automatically sets PORT, use it or fallback to 3001

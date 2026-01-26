@@ -1,4 +1,4 @@
-import { resend } from '../config/resend.config';
+import { getResend } from '../config/resend.config';
 import { render } from '@react-email/render';
 import VerificationEmail from '../email/verification-email';
 
@@ -16,6 +16,9 @@ async function verifyEmail({
   otpExpiresAt: Date;
 }) {
   try {
+    // Get resend instance lazily (after dotenv has loaded)
+    const resend = getResend();
+    
     if (!resend) {
       console.warn('Resend API key not configured. Email sending is disabled.');
       console.log(`[DEV MODE] Verification email would be sent to ${to} with OTP: ${otp}`);
@@ -36,6 +39,7 @@ async function verifyEmail({
       html: emailHtml,
     });
 
+    console.log(`✅ Verification email sent successfully to ${to}`);
     return {
       success: true,
       message: 'Verification email sent successfully',

@@ -26,14 +26,44 @@ import {
   Phone,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export function Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
+          <p className="text-muted-foreground">Please wait</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session?.user) {
+    return null;
+  }
+
   const user = {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@gmail.com',
-    avatar:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
+    id: session.user._id || '',
+    name: session.user.name || 'User',
+    email: session.user.email || '',
+    avatar: session.user.image || '',
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/auth/login' });
   };
 
   const recentCalls = [
@@ -123,6 +153,7 @@ export function Dashboard() {
           <Button
             variant="ghost"
             className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out
@@ -153,7 +184,7 @@ export function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button className="w-full" asChild>
-                  <Link href="/call/new">
+                  <Link href="/meet">
                     <Phone className="h-4 w-4 mr-2" />
                     Start New Call
                   </Link>
