@@ -1,0 +1,164 @@
+// Main backend server entry point
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectToDB from './db/db.connect';
+import authRoutes from './routes/auth.routes';
+import { setupSocketIO } from './socket/socket.setup';
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+// Railway automatically sets PORT, use it or fallback to 3001
+const port = parseInt(process.env.PORT || '3001', 10);
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+  : ['http://localhost:3000', 'http://localhost:3001'];
+
+// Log allowed origins for debugging
+console.log('🔒 CORS Allowed Origins:', allowedOrigins);
+
+// CORS setup
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin matches any allowed origin (exact match or wildcard)
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        callback(null, true);
+      } else {
+        // For ngrok and production, also check if origin contains the domain
+        const isAllowed = allowedOrigins.some(allowed => {
+          try {
+            const allowedUrl = new URL(allowed);
+            const originUrl = new URL(origin);
+            // Allow if same hostname (for ngrok subdomains)
+            return originUrl.hostname.includes(allowedUrl.hostname.replace('*.', '')) ||
+                   allowedUrl.hostname === '*' ||
+                   originUrl.hostname.endsWith(allowedUrl.hostname.replace('*.', ''));
+          } catch {
+            return false;
+          }
+        });
+        
+        if (isAllowed) {
+          callback(null, true);
+        } else {
+          console.warn('⚠️  CORS blocked origin:', origin);
+          console.warn('⚠️  Allowed origins:', allowedOrigins);
+          callback(new Error('Not allowed by CORS'));
+        }
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+
+// Middleware to handle ngrok browser warning
+app.use((req, res, next) => {
+  // Set header to skip ngrok browser warning
+  res.setHeader('ngrok-skip-browser-warning', 'true');
+  next();
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// API Routes
+app.use('/api/auth', authRoutes);
+
+// Create HTTP server
+const server = createServer(app);
+
+// Setup Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      
+      // Check if origin matches any allowed origin (exact match or wildcard)
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        callback(null, true);
+      } else {
+        // For ngrok and production, also check if origin contains the domain
+        const isAllowed = allowedOrigins.some(allowed => {
+          try {
+            const allowedUrl = new URL(allowed);
+            const originUrl = new URL(origin);
+            // Allow if same hostname (for ngrok subdomains)
+            return originUrl.hostname.includes(allowedUrl.hostname.replace('*.', '')) ||
+                   allowedUrl.hostname === '*' ||
+                   originUrl.hostname.endsWith(allowedUrl.hostname.replace('*.', ''));
+          } catch {
+            return false;
+          }
+        });
+        
+        if (isAllowed) {
+          callback(null, true);
+        } else {
+          console.warn('⚠️  Socket.IO CORS blocked origin:', origin);
+          callback(new Error('Not allowed by CORS'));
+        }
+      }
+    },
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+    credentials: true,
+  },
+  transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket (better for ngrok)
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  upgradeTimeout: 10000,
+  maxHttpBufferSize: 1e6,
+});
+
+// Setup socket handlers
+setupSocketIO(io);
+
+// Connect to database (non-blocking - server will start even if DB fails)
+connectToDB()
+  .then(() => {
+    console.log('✅ Database connection established');
+  })
+  .catch((error) => {
+    console.warn('⚠️  Database connection failed, but server will continue:', error.message);
+    console.warn('⚠️  Some features requiring database may not work.');
+  })
+  .finally(() => {
+    // Start server regardless of database connection status
+    server.listen(port, '0.0.0.0', () => {
+      console.log(`🚀 Backend server running on port ${port}`);
+      console.log(`📡 Allowed origins: ${allowedOrigins.join(', ')}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+  });
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});

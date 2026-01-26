@@ -1,0 +1,39 @@
+{
+  "name": "let-meet-backend",
+  "version": "1.0.0",
+  "description": "Backend server for Let-Meet WebRTC app",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "type-check": "tsc --noEmit",
+    "ngrok": "ngrok http 3001"
+  },
+  "keywords": ["express", "webrtc", "socket.io", "api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "cors": "^2.8.5",
+    "mongoose": "^8.18.0",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^4.1.1",
+    "resend": "^6.0.1",
+    "@react-email/components": "0.5.1",
+    "@react-email/render": "^1.2.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.19.9",
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/react": "^18.3.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.9.2"
+  }
+}
