@@ -391,15 +391,33 @@ export const useVideoCallRoom = () => {
   );
 
   const handleToggleChat = useCallback(() => {
-    setIsChatOpen(!isChatOpen);
-    if (!isChatOpen) {
-      setUnreadMessages(0);
-    }
-  }, [isChatOpen]);
+    setIsChatOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setUnreadMessages(0);
+        setIsParticipantsOpen(false);
+        setIsVirtualBackgroundsOpen(false);
+        setIsCallQualityOpen(false);
+        setIsMeetingNotesOpen(false);
+        setIsAdvancedAudioOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const handleToggleParticipants = useCallback(() => {
-    setIsParticipantsOpen(!isParticipantsOpen);
-  }, [isParticipantsOpen]);
+    setIsParticipantsOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsChatOpen(false);
+        setIsVirtualBackgroundsOpen(false);
+        setIsCallQualityOpen(false);
+        setIsMeetingNotesOpen(false);
+        setIsAdvancedAudioOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const handleRaiseHand = useCallback(() => {
     const newHandRaisedState = !isHandRaised;
@@ -438,20 +456,60 @@ export const useVideoCallRoom = () => {
   }, []);
 
   const toggleVirtualBackgrounds = useCallback(() => {
-    setIsVirtualBackgroundsOpen(!isVirtualBackgroundsOpen);
-  }, [isVirtualBackgroundsOpen]);
+    setIsVirtualBackgroundsOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsChatOpen(false);
+        setIsParticipantsOpen(false);
+        setIsCallQualityOpen(false);
+        setIsMeetingNotesOpen(false);
+        setIsAdvancedAudioOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const toggleCallQuality = useCallback(() => {
-    setIsCallQualityOpen(!isCallQualityOpen);
-  }, [isCallQualityOpen]);
+    setIsCallQualityOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsChatOpen(false);
+        setIsParticipantsOpen(false);
+        setIsVirtualBackgroundsOpen(false);
+        setIsMeetingNotesOpen(false);
+        setIsAdvancedAudioOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const toggleMeetingNotes = useCallback(() => {
-    setIsMeetingNotesOpen(!isMeetingNotesOpen);
-  }, [isMeetingNotesOpen]);
+    setIsMeetingNotesOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsChatOpen(false);
+        setIsParticipantsOpen(false);
+        setIsVirtualBackgroundsOpen(false);
+        setIsCallQualityOpen(false);
+        setIsAdvancedAudioOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const toggleAdvancedAudio = useCallback(() => {
-    setIsAdvancedAudioOpen(!isAdvancedAudioOpen);
-  }, [isAdvancedAudioOpen]);
+    setIsAdvancedAudioOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsChatOpen(false);
+        setIsParticipantsOpen(false);
+        setIsVirtualBackgroundsOpen(false);
+        setIsCallQualityOpen(false);
+        setIsMeetingNotesOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const handleAudioSettingsChange = useCallback((newSettings: AudioSettings) => {
     setAudioSettings(newSettings);

@@ -66,18 +66,18 @@ export function AdvancedAudioControls({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="w-[480px] bg-gray-900/95 backdrop-blur-xl border-gray-700"
+        className="flex flex-col w-full sm:w-[480px] max-w-full bg-card backdrop-blur-xl border-border overflow-hidden"
       >
-        <SheetHeader>
-          <SheetTitle className="text-white flex items-center gap-2">
+        <SheetHeader className="shrink-0">
+          <SheetTitle className="flex items-center gap-2">
             <Headphones className="w-5 h-5" />
             Advanced Audio Controls
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6">
+        <div className="flex-1 min-h-0 overflow-y-auto mt-4 pr-2">
           <Tabs defaultValue="enhancement" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+            <TabsList className="grid w-full grid-cols-3 bg-muted">
               <TabsTrigger value="enhancement">Enhancement</TabsTrigger>
               <TabsTrigger value="levels">Levels</TabsTrigger>
               <TabsTrigger value="testing">Testing</TabsTrigger>
@@ -85,20 +85,20 @@ export function AdvancedAudioControls({
 
             <TabsContent value="enhancement" className="space-y-4 mt-4">
               {/* Audio Processing Features */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2">
                     <Brain className="w-4 h-4" />
                     AI Audio Processing
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription>
                     Advanced audio enhancement powered by machine learning
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4" />
                         Noise Suppression
                       </Label>
@@ -111,7 +111,7 @@ export function AdvancedAudioControls({
                     </div>
                     {settings.noiseSuppression && (
                       <div className="ml-6 space-y-2">
-                        <Label className="text-gray-300 text-sm">
+                        <Label className="text-sm text-muted-foreground">
                           Suppression Level: {settings.noiseSuppressionLevel}%
                         </Label>
                         <Slider
@@ -127,7 +127,7 @@ export function AdvancedAudioControls({
                     )}
 
                     <div className="flex items-center justify-between">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Waves className="w-4 h-4" />
                         Echo Cancellation
                       </Label>
@@ -140,7 +140,7 @@ export function AdvancedAudioControls({
                     </div>
                     {settings.echoCancellation && (
                       <div className="ml-6 space-y-2">
-                        <Label className="text-gray-300 text-sm">
+                        <Label className="text-sm text-muted-foreground">
                           Cancellation Level: {settings.echoCancellationLevel}%
                         </Label>
                         <Slider
@@ -156,7 +156,7 @@ export function AdvancedAudioControls({
                     )}
 
                     <div className="flex items-center justify-between">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Zap className="w-4 h-4" />
                         Auto Gain Control
                       </Label>
@@ -169,7 +169,7 @@ export function AdvancedAudioControls({
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Wind className="w-4 h-4" />
                         High-Pass Filter
                       </Label>
@@ -182,7 +182,7 @@ export function AdvancedAudioControls({
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Ear className="w-4 h-4" />
                         Voice Enhancement
                       </Label>
@@ -195,7 +195,7 @@ export function AdvancedAudioControls({
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <Label className="text-white flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Music className="w-4 h-4" />
                         Music Mode
                       </Label>
@@ -211,23 +211,23 @@ export function AdvancedAudioControls({
               </Card>
 
               {/* Audio Quality Settings */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2">
                     <Settings className="w-4 h-4" />
                     Quality Settings
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-white mb-2 block">Sample Rate</Label>
+                    <Label className="mb-2 block">Sample Rate</Label>
                     <Select
                       value={settings.sampleRate.toString()}
                       onValueChange={(value: string) =>
                         updateSetting('sampleRate', parseInt(value))
                       }
                     >
-                      <SelectTrigger className="bg-gray-700 border-gray-600">
+                      <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -246,14 +246,14 @@ export function AdvancedAudioControls({
                   </div>
 
                   <div>
-                    <Label className="text-white mb-2 block">Bitrate</Label>
+                    <Label className="mb-2 block">Bitrate</Label>
                     <Select
                       value={settings.bitrate.toString()}
                       onValueChange={(value: string) =>
                         updateSetting('bitrate', parseInt(value))
                       }
                     >
-                      <SelectTrigger className="bg-gray-700 border-gray-600">
+                      <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -268,30 +268,30 @@ export function AdvancedAudioControls({
               </Card>
 
               {/* Processing Stats */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="w-4 h-4" />
                     Processing Statistics
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Audio Latency</span>
+                    <span className="text-muted-foreground">Audio Latency</span>
                     <Badge variant="secondary">
                       {processingStats.latency}ms
                     </Badge>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">CPU Usage</span>
+                    <span className="text-muted-foreground">CPU Usage</span>
                     <Badge variant="secondary">
                       {processingStats.cpuUsage}%
                     </Badge>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Audio Quality</span>
+                    <span className="text-muted-foreground">Audio Quality</span>
                     <Badge
                       variant={
                         processingStats.quality >= 90 ? 'default' : 'secondary'
@@ -307,16 +307,16 @@ export function AdvancedAudioControls({
 
             <TabsContent value="levels" className="space-y-4 mt-4">
               {/* Input Volume */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2">
                     <Mic className="w-4 h-4" />
                     Input Levels
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-white">
+                    <Label>
                       Input Volume: {settings.inputVolume}%
                     </Label>
                     <Slider
@@ -331,26 +331,26 @@ export function AdvancedAudioControls({
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">Input Level</Label>
+                    <Label>Input Level</Label>
                     <div className="flex items-center gap-2">
                       <Progress
                         value={audioLevels.input}
                         className="flex-1 h-3"
                       />
-                      <span className="text-gray-400 text-sm w-12">
+                      <span className="text-muted-foreground text-sm w-12">
                         {Math.round(audioLevels.input)}%
                       </span>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">Noise Level</Label>
+                    <Label>Noise Level</Label>
                     <div className="flex items-center gap-2">
                       <Progress
                         value={audioLevels.noise}
                         className="flex-1 h-3"
                       />
-                      <span className="text-gray-400 text-sm w-12">
+                      <span className="text-muted-foreground text-sm w-12">
                         {Math.round(audioLevels.noise)}%
                       </span>
                     </div>
@@ -368,16 +368,16 @@ export function AdvancedAudioControls({
               </Card>
 
               {/* Output Volume */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2">
                     <Volume2 className="w-4 h-4" />
                     Output Levels
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-white">
+                    <Label>
                       Output Volume: {settings.outputVolume}%
                     </Label>
                     <Slider
@@ -392,13 +392,13 @@ export function AdvancedAudioControls({
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">Output Level</Label>
+                    <Label>Output Level</Label>
                     <div className="flex items-center gap-2">
                       <Progress
                         value={audioLevels.output}
                         className="flex-1 h-3"
                       />
-                      <span className="text-gray-400 text-sm w-12">
+                      <span className="text-muted-foreground text-sm w-12">
                         {Math.round(audioLevels.output)}%
                       </span>
                     </div>
@@ -407,12 +407,12 @@ export function AdvancedAudioControls({
               </Card>
 
               {/* Real-time Audio Visualization */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white">Audio Waveform</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-24 bg-gray-700/30 rounded-lg flex items-end justify-center gap-1 p-2">
+                  <div className="h-24 bg-muted/50 rounded-lg flex items-end justify-center gap-1 p-2">
                     {Array.from({ length: 20 }).map((_, i) => (
                       <motion.div
                         key={i}
@@ -434,17 +434,17 @@ export function AdvancedAudioControls({
 
             <TabsContent value="testing" className="space-y-4 mt-4">
               {/* Audio Device Tests */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white">Device Testing</CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription>
                     Test your audio devices to ensure optimal performance
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button
                     variant="outline"
-                    className="w-full justify-start gap-3 border-gray-600 text-white hover:bg-gray-800"
+                    className="w-full justify-start gap-3"
                     onClick={() => runAudioTest('microphone')}
                     disabled={isProcessingTest}
                   >
@@ -471,7 +471,7 @@ export function AdvancedAudioControls({
 
                   <Button
                     variant="outline"
-                    className="w-full justify-start gap-3 border-gray-600 text-white hover:bg-gray-800"
+                    className="w-full justify-start gap-3"
                     onClick={() => runAudioTest('speaker')}
                     disabled={isProcessingTest}
                   >
@@ -498,7 +498,7 @@ export function AdvancedAudioControls({
 
                   <Button
                     variant="outline"
-                    className="w-full justify-start gap-3 border-gray-600 text-white hover:bg-gray-800"
+                    className="w-full justify-start gap-3"
                     onClick={() => runAudioTest('echo')}
                     disabled={isProcessingTest}
                   >
@@ -527,7 +527,7 @@ export function AdvancedAudioControls({
 
               {/* Test Results */}
               {testMode !== 'none' && (
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-muted/50 border-border">
                   <CardContent className="p-4">
                     {isProcessingTest ? (
                       <div className="text-center py-4">
@@ -560,7 +560,7 @@ export function AdvancedAudioControls({
               <Button
                 variant="outline"
                 onClick={handleResetToDefaults}
-                className="w-full border-gray-600 text-white hover:bg-gray-800"
+                className="w-full"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Reset to Defaults

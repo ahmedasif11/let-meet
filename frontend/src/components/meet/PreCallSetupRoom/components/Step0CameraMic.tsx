@@ -122,22 +122,22 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
       className="space-y-6"
     >
       {/* Video Preview */}
-      <Card className="bg-gray-800/50 border-gray-700">
-        <CardContent className="p-6">
-          <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden relative mb-4">
+      <Card className="bg-muted/50 border-border">
+        <CardContent className="p-4 sm:p-6">
+          <div className="aspect-video bg-muted rounded-lg overflow-hidden relative mb-4 min-h-[180px] sm:min-h-0">
             {isLoadingDevices || isLoadingCamera ? (
-              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                <div className="text-center text-gray-400">
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
                   <Loader2 className="w-12 h-12 mx-auto mb-2 animate-spin" />
                   <p>Loading devices...</p>
                 </div>
               </div>
             ) : !deviceAvailability.hasCamera ? (
-              <div className="w-full h-full bg-red-900/20 border border-red-600/50 flex items-center justify-center">
-                <div className="text-center text-red-400">
+              <div className="w-full h-full bg-destructive/10 border border-destructive/30 flex items-center justify-center">
+                <div className="text-center text-destructive">
                   <AlertTriangle className="w-12 h-12 mx-auto mb-2" />
                   <p className="font-medium">No Camera Detected</p>
-                  <p className="text-sm text-red-300 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {deviceAvailability.cameraError || 'Camera not available'}
                   </p>
                 </div>
@@ -151,18 +151,18 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : settings.camera.enabled ? (
-              <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                <div className="text-center text-white">
+              <div className="w-full h-full bg-primary/20 flex items-center justify-center">
+                <div className="text-center text-foreground">
                   <Video className="w-12 h-12 mx-auto mb-2" />
                   <p>Camera Preview</p>
-                  <p className="text-sm text-gray-300">
+                  <p className="text-sm text-muted-foreground">
                     HD • {settings.camera.resolution}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                <div className="text-center text-gray-400">
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
                   <CameraOff className="w-12 h-12 mx-auto mb-2" />
                   <p>Camera Off</p>
                 </div>
@@ -182,14 +182,13 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                 </div>
               )}
 
-            {/* Microphone error indicator */}
             {settings.microphone.enabled &&
               !deviceAvailability.hasMicrophone && (
                 <div className="absolute bottom-4 left-4 right-4">
-                  <div className="bg-red-900/50 border border-red-600/50 rounded-lg p-2">
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-2">
                     <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-red-400" />
-                      <span className="text-red-400 text-sm">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                      <span className="text-destructive text-sm">
                         Microphone not available
                       </span>
                     </div>
@@ -200,9 +199,9 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
 
           {/* Camera Controls */}
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
               <Button
-                variant={settings.camera.enabled ? 'default' : 'secondary'}
+                variant={settings.camera.enabled ? 'default' : 'outline'}
                 size="icon"
                 disabled={!deviceAvailability.hasCamera}
                 onClick={() =>
@@ -214,6 +213,7 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                     },
                   }))
                 }
+                className={!settings.camera.enabled ? 'border-border bg-muted/50 hover:bg-muted' : ''}
               >
                 {settings.camera.enabled ? (
                   <Camera className="w-4 h-4" />
@@ -223,7 +223,7 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
               </Button>
 
               <Button
-                variant={settings.microphone.enabled ? 'default' : 'secondary'}
+                variant={settings.microphone.enabled ? 'default' : 'outline'}
                 size="icon"
                 disabled={!deviceAvailability.hasMicrophone}
                 onClick={() =>
@@ -235,6 +235,7 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                     },
                   }))
                 }
+                className={!settings.microphone.enabled ? 'border-border bg-muted/50 hover:bg-muted' : ''}
               >
                 {settings.microphone.enabled ? (
                   <Mic className="w-4 h-4" />
@@ -243,8 +244,8 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                 )}
               </Button>
 
-              <div className="flex-1">
-                <Label className="text-white mb-2 block">Display Name</Label>
+              <div className="flex-1 min-w-0">
+                <Label className="mb-2 block">Display Name</Label>
                 <input
                   type="text"
                   value={settings.displayName}
@@ -254,7 +255,7 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                       displayName: e.target.value,
                     }))
                   }
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  className="w-full px-3 py-2 bg-background border border-input rounded-lg text-foreground"
                   placeholder="Enter your name"
                 />
               </div>
@@ -276,7 +277,7 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                     devices.cameras.length === 0
                   }
                 >
-                  <SelectTrigger className="bg-gray-700 border-gray-600">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -298,14 +299,14 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                   </SelectContent>
                 </Select>
                 {!deviceAvailability.hasCamera && (
-                  <p className="text-red-400 text-xs mt-1">
+                  <p className="text-destructive text-xs mt-1">
                     {deviceAvailability.cameraError || 'Camera not detected'}
                   </p>
                 )}
               </div>
 
               <div>
-                <Label className="text-white mb-2 block">Quality</Label>
+                <Label className="mb-2 block">Quality</Label>
                 <Select
                   value={settings.camera.resolution}
                   onValueChange={(value: string) =>
@@ -315,7 +316,7 @@ export const Step0CameraMic: React.FC<Step0CameraMicProps> = ({
                     }))
                   }
                 >
-                  <SelectTrigger className="bg-gray-700 border-gray-600">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

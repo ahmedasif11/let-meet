@@ -292,30 +292,32 @@ export function ParticipantVideo({
         </div>
       )}
 
-      {/* Badges */}
-      {isHost && (
-        <Badge className="absolute top-2 left-2 bg-blue-600 text-xs">
-          Host
-        </Badge>
-      )}
-      {isScreenSharing && (
-        <Badge className="absolute top-2 left-2 bg-green-600 text-xs flex items-center gap-1">
-          <Monitor className="w-3 h-3" /> Screen
-        </Badge>
-      )}
-      {isHandRaised && (
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          className="absolute top-2 right-2 text-yellow-500"
-        >
-          <Hand className="w-5 h-5" />
-        </motion.div>
-      )}
+      {/* Left side: badges + raise hand in a row so they don't overlap connection (right) */}
+      <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10 max-w-[calc(100%-4rem)]">
+        {isHost && (
+          <Badge className="bg-blue-600 text-xs shrink-0">
+            Host
+          </Badge>
+        )}
+        {isScreenSharing && (
+          <Badge className="bg-green-600 text-xs flex items-center gap-1 shrink-0">
+            <Monitor className="w-3 h-3" /> Screen
+          </Badge>
+        )}
+        {isHandRaised && (
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            className="flex items-center justify-center w-7 h-7 rounded-md bg-black/40 text-yellow-400 shrink-0"
+          >
+            <Hand className="w-4 h-4" />
+          </motion.div>
+        )}
+      </div>
 
-      {/* Connection Quality */}
+      {/* Connection Quality - top-right so it doesn't overlap raise hand (top-left) */}
       <div
-        className={`absolute top-2 right-2 ${getConnectionColor(connectionQuality)} z-10`}
+        className={`absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-md bg-black/40 ${getConnectionColor(connectionQuality)} z-10`}
       >
         {(() => {
           const Icon = getConnectionIcon(connectionQuality);

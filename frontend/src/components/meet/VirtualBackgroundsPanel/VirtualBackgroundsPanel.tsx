@@ -68,19 +68,19 @@ export function VirtualBackgroundsPanel({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="w-96 bg-gray-900/95 backdrop-blur-xl border-gray-700"
+        className="flex flex-col w-full sm:w-96 max-w-full bg-card backdrop-blur-xl border-border overflow-hidden"
       >
-        <SheetHeader>
-          <SheetTitle className="text-white flex items-center gap-2">
+        <SheetHeader className="shrink-0">
+          <SheetTitle className="flex items-center gap-2">
             <Camera className="w-5 h-5" />
             Virtual Backgrounds
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="flex-1 min-h-0 overflow-y-auto mt-4 space-y-6 pr-2">
           {/* Quick Settings */}
           <div className="flex items-center justify-between">
-            <Label htmlFor="advanced-mode" className="text-white">
+            <Label htmlFor="advanced-mode">
               Advanced Mode
             </Label>
             <Switch
@@ -91,7 +91,7 @@ export function VirtualBackgroundsPanel({
           </div>
 
           <Tabs defaultValue="presets" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+            <TabsList className="grid w-full grid-cols-3 bg-muted">
               <TabsTrigger value="presets" className="text-xs">
                 Presets
               </TabsTrigger>
@@ -111,23 +111,21 @@ export function VirtualBackgroundsPanel({
                 onClick={() => handleBackgroundSelect(noneBackground)}
                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
                   currentBackground.type === 'none'
-                    ? 'border-blue-500 bg-blue-500/10'
-                    : 'border-gray-700 hover:border-gray-600'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border hover:border-muted-foreground/50'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-gray-800 border border-gray-600 flex items-center justify-center">
-                    <User className="w-6 h-6 text-gray-400" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center">
+                      <User className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">No Background</h4>
+                      <p className="text-muted-foreground text-sm">Show your real background</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-white">No Background</h4>
-                    <p className="text-gray-400 text-sm">
-                      Show your real background
-                    </p>
-                  </div>
-                </div>
                 {currentBackground.type === 'none' && (
-                  <div className="absolute top-2 right-2 w-3 h-3 bg-blue-500 rounded-full" />
+                  <div className="absolute top-2 right-2 w-3 h-3 bg-primary rounded-full" />
                 )}
               </motion.div>
 
@@ -138,23 +136,21 @@ export function VirtualBackgroundsPanel({
                 onClick={() => handleBackgroundSelect(blurBackground)}
                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
                   currentBackground.type === 'blur'
-                    ? 'border-blue-500 bg-blue-500/10'
-                    : 'border-gray-700 hover:border-gray-600'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border hover:border-muted-foreground/50'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-foreground" />
                   </div>
                   <div>
-                    <h4 className="text-white">Blur Background</h4>
-                    <p className="text-gray-400 text-sm">
-                      Blur your background
-                    </p>
+                    <h4 className="font-medium">Blur Background</h4>
+                    <p className="text-muted-foreground text-sm">Blur your background</p>
                   </div>
                 </div>
                 {currentBackground.type === 'blur' && (
-                  <div className="absolute top-2 right-2 w-3 h-3 bg-blue-500 rounded-full" />
+                  <div className="absolute top-2 right-2 w-3 h-3 bg-primary rounded-full" />
                 )}
               </motion.div>
 
@@ -166,7 +162,7 @@ export function VirtualBackgroundsPanel({
                   exit={{ opacity: 0, height: 0 }}
                   className="space-y-2"
                 >
-                  <Label className="text-white text-sm">
+                  <Label className="text-sm">
                     Blur Amount: {blurAmount}%
                   </Label>
                   <Slider
@@ -182,7 +178,7 @@ export function VirtualBackgroundsPanel({
 
               {/* Color Backgrounds */}
               <div className="space-y-3">
-                <h4 className="text-white">Color Backgrounds</h4>
+                <h4 className="font-medium">Color Backgrounds</h4>
                 <div className="grid grid-cols-2 gap-3">
                   {colorBackgrounds.map((bg) => (
                     <motion.div
@@ -191,14 +187,12 @@ export function VirtualBackgroundsPanel({
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleBackgroundSelect(bg)}
                       className={`relative aspect-video rounded-lg cursor-pointer border-2 overflow-hidden ${
-                        currentBackground.id === bg.id
-                          ? 'border-blue-500'
-                          : 'border-gray-700 hover:border-gray-600'
+                        currentBackground.id === bg.id ? 'border-primary' : 'border-border hover:border-muted-foreground/50'
                       }`}
                       style={{ background: bg.value }}
                     >
                       {currentBackground.id === bg.id && (
-                        <div className="absolute top-1 right-1 w-3 h-3 bg-blue-500 rounded-full" />
+                        <div className="absolute top-1 right-1 w-3 h-3 bg-primary rounded-full" />
                       )}
                       <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
                         <p className="text-white text-xs">{bg.name}</p>
@@ -218,9 +212,7 @@ export function VirtualBackgroundsPanel({
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleBackgroundSelect(bg)}
                     className={`relative aspect-video rounded-lg cursor-pointer border-2 overflow-hidden ${
-                      currentBackground.id === bg.id
-                        ? 'border-blue-500'
-                        : 'border-gray-700 hover:border-gray-600'
+                      currentBackground.id === bg.id ? 'border-primary' : 'border-border hover:border-muted-foreground/50'
                     }`}
                   >
                     <ImageWithFallback
@@ -234,7 +226,7 @@ export function VirtualBackgroundsPanel({
                       </Badge>
                     )}
                     {currentBackground.id === bg.id && (
-                      <div className="absolute top-1 right-1 w-3 h-3 bg-blue-500 rounded-full" />
+                      <div className="absolute top-1 right-1 w-3 h-3 bg-primary rounded-full" />
                     )}
                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
                       <p className="text-white text-xs">{bg.name}</p>
@@ -244,31 +236,23 @@ export function VirtualBackgroundsPanel({
               </div>
 
               {/* Upload Custom Image */}
-              <Button
-                variant="outline"
-                className="w-full border-gray-600 text-white hover:bg-gray-800"
-              >
+              <Button variant="outline" className="w-full">
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Custom Image
               </Button>
             </TabsContent>
 
             <TabsContent value="custom" className="space-y-4">
-              {/* Custom Color */}
               <div className="space-y-3">
-                <Label className="text-white">Custom Color</Label>
+                <Label>Custom Color</Label>
                 <div className="flex gap-2">
                   <input
                     type="color"
                     value={customColor}
                     onChange={(e) => setCustomColor(e.target.value)}
-                    className="w-12 h-12 rounded-lg border border-gray-600 bg-transparent cursor-pointer"
+                    className="w-12 h-12 rounded-lg border border-border bg-transparent cursor-pointer"
                   />
-                  <Button
-                    onClick={handleCreateCustomColor}
-                    className="flex-1"
-                    variant="secondary"
-                  >
+                  <Button onClick={handleCreateCustomColor} className="flex-1" variant="secondary">
                     <Palette className="w-4 h-4 mr-2" />
                     Apply Color
                   </Button>
@@ -277,22 +261,18 @@ export function VirtualBackgroundsPanel({
 
               {/* Advanced Settings */}
               {isAdvancedMode && (
-                <div className="space-y-4 p-4 bg-gray-800/50 rounded-lg">
-                  <h4 className="text-white flex items-center gap-2">
+                <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                  <h4 className="font-medium flex items-center gap-2">
                     <Settings className="w-4 h-4" />
                     Advanced Settings
                   </h4>
-
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-gray-300">Edge Smoothing</Label>
+                      <Label>Edge Smoothing</Label>
                       <Switch defaultChecked />
                     </div>
-
                     <div className="space-y-2">
-                      <Label className="text-gray-300">
-                        Background Opacity
-                      </Label>
+                      <Label>Background Opacity</Label>
                       <Slider
                         defaultValue={[100]}
                         max={100}
@@ -302,19 +282,14 @@ export function VirtualBackgroundsPanel({
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <Label className="text-gray-300">Motion Blur</Label>
+                      <Label>Motion Blur</Label>
                       <Switch />
                     </div>
                   </div>
                 </div>
               )}
-
-              {/* Download/Share Options */}
               <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-600 text-white hover:bg-gray-800"
-                >
+                <Button variant="outline" className="w-full">
                   <Download className="w-4 h-4 mr-2" />
                   Download Current Setup
                 </Button>

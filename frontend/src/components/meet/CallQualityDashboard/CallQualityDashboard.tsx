@@ -85,10 +85,10 @@ export function CallQualityDashboard({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="w-96 bg-gray-900/95 backdrop-blur-xl border-gray-700"
+        className="flex flex-col w-full sm:w-96 max-w-full bg-card backdrop-blur-xl border-border overflow-hidden"
       >
-        <SheetHeader>
-          <SheetTitle className="text-white flex items-center gap-2">
+        <SheetHeader className="shrink-0">
+          <SheetTitle className="flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Call Quality Dashboard
           </SheetTitle>
@@ -98,7 +98,6 @@ export function CallQualityDashboard({
               size="sm"
               onClick={refreshStats}
               disabled={isRefreshing}
-              className="text-gray-400 hover:text-white"
             >
               <RefreshCw
                 className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}
@@ -108,16 +107,15 @@ export function CallQualityDashboard({
               variant="ghost"
               size="sm"
               onClick={exportReport}
-              className="text-gray-400 hover:text-white"
             >
               <Download className="w-4 h-4" />
             </Button>
           </div>
         </SheetHeader>
 
-        <div className="mt-6">
+        <div className="flex-1 min-h-0 overflow-y-auto mt-4 pr-2">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+            <TabsList className="grid w-full grid-cols-3 bg-muted">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="network">Network</TabsTrigger>
               <TabsTrigger value="performance">Performance</TabsTrigger>
@@ -125,9 +123,9 @@ export function CallQualityDashboard({
 
             <TabsContent value="overview" className="space-y-4 mt-4">
               {/* Overall Quality Score */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground flex items-center gap-2">
                     <Activity className="w-4 h-4" />
                     Overall Quality
                   </CardTitle>
@@ -135,7 +133,7 @@ export function CallQualityDashboard({
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Overall</span>
+                      <span className="text-muted-foreground">Overall</span>
                       <Badge
                         className={`${getQualityColor(qualityMetrics.overall)} bg-transparent border`}
                       >
@@ -156,7 +154,7 @@ export function CallQualityDashboard({
                                 ? 'C'
                                 : 'D'}
                         </div>
-                        <div className="text-xs text-gray-400">Video</div>
+                        <div className="text-xs text-muted-foreground">Video</div>
                       </div>
 
                       <div className="text-center">
@@ -171,7 +169,7 @@ export function CallQualityDashboard({
                                 ? 'C'
                                 : 'D'}
                         </div>
-                        <div className="text-xs text-gray-400">Audio</div>
+                        <div className="text-xs text-muted-foreground">Audio</div>
                       </div>
 
                       <div className="text-center">
@@ -186,7 +184,7 @@ export function CallQualityDashboard({
                                 ? 'C'
                                 : 'D'}
                         </div>
-                        <div className="text-xs text-gray-400">Network</div>
+                        <div className="text-xs text-muted-foreground">Network</div>
                       </div>
                     </div>
                   </div>
@@ -194,53 +192,53 @@ export function CallQualityDashboard({
               </Card>
 
               {/* Call Statistics */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white">Call Statistics</CardTitle>
+                  <CardTitle className="text-foreground">Call Statistics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Duration</span>
-                    <span className="text-white">
+                    <span className="text-muted-foreground">Duration</span>
+                    <span className="text-foreground">
                       {formatDuration(callStats.duration)}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Participants</span>
-                    <span className="text-white">{callStats.participants}</span>
+                    <span className="text-muted-foreground">Participants</span>
+                    <span className="text-foreground">{callStats.participants}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Bitrate</span>
-                    <span className="text-white">
+                    <span className="text-muted-foreground">Bitrate</span>
+                    <span className="text-foreground">
                       {formatBitrate(callStats.bitrate)}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Resolution</span>
-                    <span className="text-white">{callStats.resolution}</span>
+                    <span className="text-muted-foreground">Resolution</span>
+                    <span className="text-foreground">{callStats.resolution}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">FPS</span>
-                    <span className="text-white">{callStats.fps}</span>
+                    <span className="text-muted-foreground">FPS</span>
+                    <span className="text-foreground">{callStats.fps}</span>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Recent Alerts */}
               {alerts.length > 0 && (
-                <Card className="bg-gray-800/50 border-gray-700">
+                <Card className="bg-muted/50 border-border">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-white">Recent Alerts</CardTitle>
+                    <CardTitle className="text-foreground">Recent Alerts</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {alerts.slice(0, 3).map((alert) => (
                       <div
                         key={alert.id}
-                        className="flex items-start gap-2 p-2 bg-gray-700/30 rounded"
+                        className="flex items-start gap-2 p-2 bg-muted/50 rounded"
                       >
                         {alert.type === 'warning' && (
                           <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5" />
@@ -252,8 +250,8 @@ export function CallQualityDashboard({
                           <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5" />
                         )}
                         <div className="flex-1">
-                          <p className="text-white text-sm">{alert.message}</p>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-foreground text-sm">{alert.message}</p>
+                          <p className="text-muted-foreground text-xs">
                             {new Date(alert.timestamp).toLocaleTimeString()}
                           </p>
                         </div>
@@ -266,26 +264,26 @@ export function CallQualityDashboard({
 
             <TabsContent value="network" className="space-y-4 mt-4">
               {/* Network Statistics */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground flex items-center gap-2">
                     <Wifi className="w-4 h-4" />
                     Network Connection
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Connection Type</span>
-                    <span className="text-white">
+                    <span className="text-muted-foreground">Connection Type</span>
+                    <span className="text-foreground">
                       {networkStats.connectionType}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Signal Strength</span>
+                    <span className="text-muted-foreground">Signal Strength</span>
                     <div className="flex items-center gap-2">
                       <Wifi className="w-4 h-4 text-blue-500" />
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {networkStats.signalStrength}%
                       </span>
                     </div>
@@ -293,8 +291,8 @@ export function CallQualityDashboard({
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Latency</span>
-                      <span className="text-white">
+                      <span className="text-muted-foreground">Latency</span>
+                      <span className="text-foreground">
                         {networkStats.latency}ms
                       </span>
                     </div>
@@ -306,8 +304,8 @@ export function CallQualityDashboard({
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Jitter</span>
-                      <span className="text-white">
+                      <span className="text-muted-foreground">Jitter</span>
+                      <span className="text-foreground">
                         {networkStats.jitter}ms
                       </span>
                     </div>
@@ -319,8 +317,8 @@ export function CallQualityDashboard({
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Packet Loss</span>
-                      <span className="text-white">
+                      <span className="text-muted-foreground">Packet Loss</span>
+                      <span className="text-foreground">
                         {networkStats.packetLoss}%
                       </span>
                     </div>
@@ -331,8 +329,8 @@ export function CallQualityDashboard({
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Bandwidth</span>
-                    <span className="text-white">
+                    <span className="text-muted-foreground">Bandwidth</span>
+                    <span className="text-foreground">
                       {formatBitrate(networkStats.bandwidth)}
                     </span>
                   </div>
@@ -342,9 +340,9 @@ export function CallQualityDashboard({
 
             <TabsContent value="performance" className="space-y-4 mt-4">
               {/* Device Performance */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground flex items-center gap-2">
                     <Cpu className="w-4 h-4" />
                     Device Performance
                   </CardTitle>
@@ -352,11 +350,11 @@ export function CallQualityDashboard({
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300 flex items-center gap-2">
+                      <span className="text-muted-foreground flex items-center gap-2">
                         <Cpu className="w-4 h-4" />
                         CPU Usage
                       </span>
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {deviceStats.cpuUsage}%
                       </span>
                     </div>
@@ -365,11 +363,11 @@ export function CallQualityDashboard({
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300 flex items-center gap-2">
+                      <span className="text-muted-foreground flex items-center gap-2">
                         <HardDrive className="w-4 h-4" />
                         Memory Usage
                       </span>
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {deviceStats.memoryUsage}%
                       </span>
                     </div>
@@ -379,8 +377,8 @@ export function CallQualityDashboard({
                   {deviceStats.gpuUsage && (
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-300">GPU Usage</span>
-                        <span className="text-white">
+                        <span className="text-muted-foreground">GPU Usage</span>
+                        <span className="text-foreground">
                           {deviceStats.gpuUsage}%
                         </span>
                       </div>
@@ -390,11 +388,11 @@ export function CallQualityDashboard({
 
                   {deviceStats.batteryLevel && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300 flex items-center gap-2">
+                      <span className="text-muted-foreground flex items-center gap-2">
                         <Battery className="w-4 h-4" />
                         Battery
                       </span>
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {deviceStats.batteryLevel}%
                       </span>
                     </div>
@@ -402,11 +400,11 @@ export function CallQualityDashboard({
 
                   {deviceStats.temperature && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-300 flex items-center gap-2">
+                      <span className="text-muted-foreground flex items-center gap-2">
                         <Thermometer className="w-4 h-4" />
                         Temperature
                       </span>
-                      <span className="text-white">
+                      <span className="text-foreground">
                         {deviceStats.temperature}°C
                       </span>
                     </div>
@@ -415,16 +413,16 @@ export function CallQualityDashboard({
               </Card>
 
               {/* Performance Trends */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white">
+                  <CardTitle className="text-foreground">
                     Performance Trends
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Latency Trend</span>
+                      <span className="text-muted-foreground">Latency Trend</span>
                       <div className="flex items-center gap-1">
                         {performanceData[performanceData.length - 1].latency >
                         performanceData[performanceData.length - 2].latency ? (
@@ -432,7 +430,7 @@ export function CallQualityDashboard({
                         ) : (
                           <TrendingDown className="w-4 h-4 text-green-500" />
                         )}
-                        <span className="text-white text-sm">
+                        <span className="text-foreground text-sm">
                           {performanceData[performanceData.length - 1].latency}
                           ms
                         </span>
@@ -440,7 +438,7 @@ export function CallQualityDashboard({
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Bitrate Trend</span>
+                      <span className="text-muted-foreground">Bitrate Trend</span>
                       <div className="flex items-center gap-1">
                         {performanceData[performanceData.length - 1].bitrate >
                         performanceData[performanceData.length - 2].bitrate ? (
@@ -448,7 +446,7 @@ export function CallQualityDashboard({
                         ) : (
                           <TrendingDown className="w-4 h-4 text-red-500" />
                         )}
-                        <span className="text-white text-sm">
+                        <span className="text-foreground text-sm">
                           {formatBitrate(
                             performanceData[performanceData.length - 1].bitrate
                           )}

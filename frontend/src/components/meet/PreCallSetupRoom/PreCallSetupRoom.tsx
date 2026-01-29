@@ -172,37 +172,33 @@ export function PreCallSetupRoom({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 overflow-auto">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-gray-900 rounded-2xl border border-gray-700 w-full max-w-4xl h-[80vh] flex overflow-hidden"
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-card rounded-2xl border border-border w-full max-w-4xl min-h-[70vh] max-h-[95vh] flex flex-col lg:flex-row overflow-hidden shadow-xl"
       >
-        {/* Left sidebar - Meeting info and progress */}
-        <div className="w-80 flex-shrink-0 bg-gray-800/50 p-6 flex flex-col">
-          <div className="mb-6">
-            <h2 className="text-white text-xl mb-2">Join Meeting</h2>
-            <div className="space-y-2 text-gray-300">
-              <p className="text-sm">{meetingInfo.title}</p>
-              <p className="text-sm text-gray-400">
-                Hosted by {meetingInfo.host}
-              </p>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Users className="w-4 h-4" />
+        {/* Left sidebar - Meeting info and progress (stacked on mobile) */}
+        <div className="w-full lg:w-80 flex-shrink-0 bg-muted/30 p-4 sm:p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-border">
+          <div className="mb-4 sm:mb-6">
+            <h2 className="text-foreground text-lg sm:text-xl font-semibold mb-2">Join Meeting</h2>
+            <div className="space-y-2 text-muted-foreground text-sm">
+              <p className="font-medium text-foreground">{meetingInfo.title}</p>
+              <p>Hosted by {meetingInfo.host}</p>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 shrink-0" />
                 <span>{meetingInfo.participants} participants</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Monitor className="w-4 h-4" />
-                <span>
-                  Scheduled for {formatTime(meetingInfo.scheduledTime)}
-                </span>
+              <div className="flex items-center gap-2">
+                <Monitor className="w-4 h-4 shrink-0" />
+                <span>Scheduled for {formatTime(meetingInfo.scheduledTime)}</span>
               </div>
             </div>
           </div>
 
-          {/* Progress Steps */}
-          <div className="space-y-4 flex-1">
+          {/* Progress Steps - horizontal on mobile, vertical on desktop */}
+          <div className="flex lg:flex-col gap-2 sm:gap-4 flex-1 overflow-x-auto pb-2 lg:pb-0">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = currentStep === index;
@@ -211,36 +207,32 @@ export function PreCallSetupRoom({
               return (
                 <div
                   key={index}
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors shrink-0 lg:shrink ${
                     isActive
-                      ? 'bg-blue-600/20 border border-blue-600/50'
+                      ? 'bg-primary/20 border border-primary/50'
                       : isCompleted
-                        ? 'bg-green-600/20'
-                        : 'bg-gray-700/50'
+                        ? 'bg-green-600/20 dark:bg-green-500/20'
+                        : 'bg-muted/50'
                   }`}
                 >
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 ${
                       isActive
-                        ? 'bg-blue-600'
+                        ? 'bg-primary text-primary-foreground'
                         : isCompleted
-                          ? 'bg-green-600'
-                          : 'bg-gray-600'
+                          ? 'bg-green-600 dark:bg-green-500 text-white'
+                          : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {isCompleted ? (
-                      <CheckCircle className="w-4 h-4 text-white" />
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                     ) : (
-                      <Icon className="w-4 h-4 text-white" />
+                      <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
                   </div>
                   <span
-                    className={`text-sm ${
-                      isActive
-                        ? 'text-white'
-                        : isCompleted
-                          ? 'text-green-400'
-                          : 'text-gray-400'
+                    className={`text-xs sm:text-sm whitespace-nowrap ${
+                      isActive ? 'text-foreground font-medium' : isCompleted ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'
                     }`}
                   >
                     {step.title}
@@ -250,10 +242,9 @@ export function PreCallSetupRoom({
             })}
           </div>
 
-          {/* Quick Settings */}
-          <div className="space-y-3 mt-6 pt-6 border-t border-gray-700">
+          <div className="space-y-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
             <div className="flex items-center justify-between">
-              <Label className="text-gray-300 text-sm">Background Blur</Label>
+              <Label className="text-sm">Background Blur</Label>
               <Switch
                 checked={callSettings.backgroundBlur}
                 onCheckedChange={(checked: boolean) =>
@@ -268,34 +259,24 @@ export function PreCallSetupRoom({
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-            <h3 className="text-white text-lg">{steps[currentStep].title}</h3>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          <div className="p-4 sm:p-6 border-b border-border flex items-center justify-between shrink-0">
+            <h3 className="text-foreground text-base sm:text-lg font-medium">{steps[currentStep].title}</h3>
+            <Button variant="outline" size="icon" onClick={onClose} className="shrink-0 border-border">
               <X className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* Step content */}
-          <div className="flex-1 min-w-0 p-6 overflow-auto overflow-x-hidden">
+          <div className="flex-1 min-w-0 p-4 sm:p-6 overflow-auto overflow-x-hidden">
             {/* Device Error Display */}
             {deviceError && (
-              <div className="mb-6 bg-red-600/20 border border-red-600/50 rounded-lg p-4">
+              <div className="mb-6 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                  <AlertTriangle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                   <div className="text-sm flex-1">
-                    <p className="text-red-400 font-medium mb-1">
-                      Device Setup Error
-                    </p>
-                    <p className="text-red-300 mb-3">{deviceError}</p>
-                    <Button
-                      onClick={refreshDevices}
-                      variant="outline"
-                      size="sm"
-                      disabled={isLoadingDevices}
-                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
-                    >
+                    <p className="text-destructive font-medium mb-1">Device Setup Error</p>
+                    <p className="text-muted-foreground mb-3">{deviceError}</p>
+                    <Button onClick={refreshDevices} variant="outline" size="sm" disabled={isLoadingDevices} className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground">
                       {isLoadingDevices ? 'Refreshing...' : 'Refresh Devices'}
                     </Button>
                   </div>
@@ -342,31 +323,25 @@ export function PreCallSetupRoom({
             </AnimatePresence>
           </div>
 
-          {/* Footer navigation */}
-          <div className="p-6 border-t border-gray-700 flex items-center justify-between">
+          <div className="p-4 sm:p-6 border-t border-border flex items-center justify-between gap-2 shrink-0">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
               disabled={currentStep === 0}
+              className="shrink-0 border-border"
             >
               Previous
             </Button>
-
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {steps.map((_, index) => (
                 <div
                   key={index}
                   className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentStep
-                      ? 'bg-blue-600'
-                      : index < currentStep
-                        ? 'bg-green-600'
-                        : 'bg-gray-600'
+                    index === currentStep ? 'bg-primary' : index < currentStep ? 'bg-green-600' : 'bg-muted'
                   }`}
                 />
               ))}
             </div>
-
             <Button
               onClick={() => {
                 if (currentStep === steps.length - 1) {
@@ -376,6 +351,7 @@ export function PreCallSetupRoom({
                 }
               }}
               disabled={!canProceedToNextStep(currentStep, isTestingDevices)}
+              className="shrink-0"
             >
               {currentStep === steps.length - 1 ? 'Join Meeting' : 'Next'}
             </Button>

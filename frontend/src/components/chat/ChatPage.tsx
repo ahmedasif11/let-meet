@@ -16,6 +16,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { ThemeToggle } from '@/components/theme';
 
 interface Message {
   id: string;
@@ -157,9 +158,12 @@ export function ChatPage() {
                 <MessageSquare className="h-6 w-6 text-blue-600" />
                 Messages
               </h1>
-              <Button variant="ghost" size="icon">
-                <UserPlus className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <ThemeToggle />
+                <Button variant="ghost" size="icon">
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -131,20 +131,15 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Theme Toggle for Desktop - Top Right */}
-      <div className="hidden lg:block fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-
       {/* Sidebar */}
       <div
         className={`fixed left-0 top-0 h-full w-64 bg-card border-r border-border p-4 z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="flex items-center mb-8">
-          <Video className="h-8 w-8 text-blue-600 mr-2" />
-          <h1 className="text-xl font-semibold">Let Meet</h1>
+        <div className="flex items-center gap-2 min-w-0 mb-8">
+          <Video className="h-8 w-8 text-blue-600 shrink-0" />
+          <h1 className="text-xl font-semibold truncate">Let Meet</h1>
         </div>
 
         <nav className="space-y-2">
@@ -234,8 +229,13 @@ export function Dashboard() {
         />
       )}
 
+      {/* Fixed top bar for main content: theme toggle only, so it never overlaps page content */}
+      <div className="hidden lg:flex fixed top-0 right-0 left-64 h-12 border-b border-border bg-background/95 backdrop-blur z-30 items-center justify-end px-4">
+        <ThemeToggle />
+      </div>
+
       {/* Main Content */}
-      <div className="lg:ml-64 pt-16 lg:pt-0 p-4 sm:p-6">
+      <div className="lg:ml-64 pt-16 lg:pt-12 p-4 sm:p-6">
         <div className="mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold mb-2">
             Welcome back, {user.name}!

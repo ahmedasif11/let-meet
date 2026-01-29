@@ -50,7 +50,7 @@ export function ReactionsOverlay({
                 <div className="text-4xl md:text-6xl mb-1">
                   {reaction.emoji}
                 </div>
-                <div className="bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                <div className="bg-background/90 text-foreground text-xs px-2 py-1 rounded-full backdrop-blur-sm border border-border shadow-sm">
                   {reaction.userName}
                 </div>
               </div>

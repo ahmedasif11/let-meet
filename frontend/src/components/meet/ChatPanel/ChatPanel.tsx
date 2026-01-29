@@ -55,22 +55,26 @@ export function ChatPanel({ isOpen, onClose, className = '' }: ChatPanelProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ x: '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className={`fixed right-0 top-0 h-full w-80 bg-gray-900/95 backdrop-blur-xl border-l border-white/10 z-50 flex flex-col ${className}`}
-        >
-          {/* Chat header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
-            <h3 className="text-white">Chat</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="text-gray-400 hover:text-white rounded-full"
-            >
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            onClick={onClose}
+            aria-hidden
+          />
+          <motion.div
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className={`fixed right-0 top-0 h-full w-full sm:w-80 max-w-full bg-card backdrop-blur-xl border-l border-border z-50 flex flex-col shadow-xl ${className}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h3 className="text-foreground font-semibold">Chat</h3>
+            <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
               <X className="w-5 h-5" />
             </Button>
           </div>
@@ -86,10 +90,7 @@ export function ChatPanel({ isOpen, onClose, className = '' }: ChatPanelProps) {
                   className={`flex gap-3 ${message.type === 'system' ? 'justify-center' : ''}`}
                 >
                   {message.type === 'system' ? (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs text-gray-400 bg-gray-800"
-                    >
+                    <Badge variant="secondary" className="text-xs">
                       {message.message}
                     </Badge>
                   ) : (
@@ -97,22 +98,14 @@ export function ChatPanel({ isOpen, onClose, className = '' }: ChatPanelProps) {
                       <Avatar
                         className="w-8 h-8 flex-shrink-0"
                         src={message.avatar}
-                        fallback={message.userName
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
+                        fallback={message.userName.split(' ').map((n) => n[0]).join('')}
                       />
-
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm text-white truncate">
-                            {message.userName}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {formatTime(message.timestamp)}
-                          </span>
+                          <span className="text-sm font-medium text-foreground truncate">{message.userName}</span>
+                          <span className="text-xs text-muted-foreground">{formatTime(message.timestamp)}</span>
                         </div>
-                        <div className="bg-gray-800 rounded-lg px-3 py-2 text-sm text-gray-100 break-words">
+                        <div className="bg-muted rounded-lg px-3 py-2 text-sm text-foreground break-words">
                           {message.message}
                         </div>
                       </div>
@@ -124,8 +117,7 @@ export function ChatPanel({ isOpen, onClose, className = '' }: ChatPanelProps) {
             </div>
           </ScrollArea>
 
-          {/* Message input */}
-          <div className="p-4 border-t border-white/10">
+          <div className="p-4 border-t border-border">
             <div className="flex gap-2">
               <Input
                 ref={inputRef}
@@ -133,19 +125,15 @@ export function ChatPanel({ isOpen, onClose, className = '' }: ChatPanelProps) {
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type a message..."
-                className="flex-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                className="flex-1"
               />
-              <Button
-                onClick={handleSendMessage}
-                disabled={!newMessage.trim()}
-                size="icon"
-                className="bg-blue-600 hover:bg-blue-700 rounded-full"
-              >
+              <Button onClick={handleSendMessage} disabled={!newMessage.trim()} size="icon" className="rounded-full shrink-0">
                 <Send className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

@@ -39,6 +39,7 @@ interface TopBarProps {
   isFullscreen: boolean;
   setIsFullscreen: (fullscreen: boolean) => void;
   onShareClick: () => void;
+  themeToggle?: React.ReactNode;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -57,17 +58,18 @@ export const TopBar: React.FC<TopBarProps> = ({
   isFullscreen,
   setIsFullscreen,
   onShareClick,
+  themeToggle,
 }) => {
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="flex items-center justify-between px-6 py-4 bg-slate-800/80 backdrop-blur-xl border-b border-white/10"
+      className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-card/95 backdrop-blur-xl border-b border-border"
     >
-      <div className="flex items-center gap-4">
-        <div>
-          <h1 className="text-white text-lg font-medium">Team Standup</h1>
-          <div className="flex items-center gap-3 text-sm text-gray-300">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        <div className="min-w-0">
+          <h1 className="text-foreground text-base sm:text-lg font-medium truncate">Team Standup</h1>
+          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground flex-wrap">
             <span>{formatDuration(callDuration)}</span>
             <span>•</span>
             <span>
@@ -80,13 +82,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                 const Icon = getConnectionIcon(connectionStatus);
                 return (
                   <Icon
-                    className={`w-4 h-4 ${getConnectionColor(connectionStatus)}`}
+                    className={`w-3 h-3 sm:w-4 sm:h-4 ${getConnectionColor(connectionStatus)}`}
                   />
                 );
               })()}
-              <span
-                className={`${getConnectionColor(connectionStatus)} text-green-500`}
-              >
+              <span className={getConnectionColor(connectionStatus)}>
                 connected
               </span>
             </div>
@@ -106,111 +106,73 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Right side controls */}
-      <div className="flex items-center gap-3">
-        {/* Page numbers */}
-        <div className="hidden lg:flex items-center gap-1 px-3 py-1 bg-slate-700/50 rounded-lg">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Page numbers - desktop only */}
+        <div className="hidden lg:flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-lg">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
             <Button
               key={count}
               variant={count === 6 ? 'default' : 'ghost'}
               size="sm"
               onClick={() => handleParticipantCountChange(count)}
-              className="w-8 h-8 text-xs rounded-md"
+              className="w-7 h-7 sm:w-8 sm:h-8 text-xs rounded-md"
             >
               {count}
             </Button>
           ))}
         </div>
 
-        {/* Global controls */}
-        <div className="hidden md:flex items-center gap-2">
-          {/* Layout controls */}
-          <div className="flex items-center gap-1 p-1 bg-slate-700/50 rounded-lg">
+        {/* Global controls - hidden on smallest screens */}
+        <div className="hidden md:flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-lg">
             <Button
               variant={layoutMode === 'grid' ? 'default' : 'ghost'}
               size="icon"
               onClick={() => setLayoutMode('grid')}
-              className="w-8 h-8 rounded-md"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-md"
             >
-              <Grid3X3 className="w-4 h-4" />
+              <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
             <Button
               variant={layoutMode === 'speaker' ? 'default' : 'ghost'}
               size="icon"
               onClick={() => setLayoutMode('speaker')}
-              className="w-8 h-8 rounded-md"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-md"
             >
-              <Monitor className="w-4 h-4" />
+              <Monitor className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
           </div>
-
-          {/* Global feature buttons */}
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onShareClick}
-              className="w-8 h-8 rounded-md hover:bg-slate-600/50"
-              title="Share Meeting Link"
-            >
-              <Share2 className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={onShareClick} className="w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-muted" title="Share Meeting Link">
+              <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleVirtualBackgrounds}
-              className="w-8 h-8 rounded-md hover:bg-slate-600/50"
-              title="Virtual Backgrounds"
-            >
-              <Palette className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={toggleVirtualBackgrounds} className="w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-muted" title="Virtual Backgrounds">
+              <Palette className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleCallQuality}
-              className="w-8 h-8 rounded-md hover:bg-slate-600/50"
-              title="Call Quality"
-            >
-              <Activity className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={toggleCallQuality} className="w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-muted" title="Call Quality">
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleMeetingNotes}
-              className="w-8 h-8 rounded-md hover:bg-slate-600/50"
-              title="Meeting Notes"
-            >
-              <FileText className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={toggleMeetingNotes} className="w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-muted" title="Meeting Notes">
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleAdvancedAudio}
-              className="w-8 h-8 rounded-md hover:bg-slate-600/50"
-              title="Advanced Audio"
-            >
-              <Settings className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={toggleAdvancedAudio} className="w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-muted" title="Advanced Audio">
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
           </div>
         </div>
 
-        {/* Fullscreen toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsFullscreen(!isFullscreen)}
-          className="w-8 h-8 rounded-md hover:bg-slate-600/50"
-        >
-          {isFullscreen ? (
-            <Minimize className="w-4 h-4" />
-          ) : (
-            <Maximize className="w-4 h-4" />
-          )}
-        </Button>
+        {/* Theme toggle + Fullscreen */}
+        <div className="flex items-center gap-1">
+          {themeToggle}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-md hover:bg-muted"
+          >
+            {isFullscreen ? <Minimize className="w-3 h-3 sm:w-4 sm:h-4" /> : <Maximize className="w-3 h-3 sm:w-4 sm:h-4" />}
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

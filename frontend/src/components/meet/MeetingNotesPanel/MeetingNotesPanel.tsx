@@ -155,14 +155,14 @@ export function MeetingNotesPanel({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="w-96 bg-gray-900/95 backdrop-blur-xl border-gray-700"
+        className="flex flex-col w-full sm:w-96 max-w-full bg-card backdrop-blur-xl border-border overflow-hidden"
       >
-        <SheetHeader>
-          <SheetTitle className="text-white flex items-center gap-2">
+        <SheetHeader className="shrink-0">
+          <SheetTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
             Meeting Notes
           </SheetTitle>
-          <div className="text-gray-400 text-sm">
+          <div className="text-muted-foreground text-sm">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
               <span>{formatDuration(callDuration)}</span>
@@ -170,16 +170,16 @@ export function MeetingNotesPanel({
           </div>
         </SheetHeader>
 
-        <div className="mt-6">
+        <div className="flex-1 min-h-0 overflow-y-auto mt-4 pr-2">
           <Tabs defaultValue="notes" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800">
+            <TabsList className="grid w-full grid-cols-2 bg-muted">
               <TabsTrigger value="notes">Notes</TabsTrigger>
               <TabsTrigger value="actions">Actions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="notes" className="space-y-4 mt-4">
               {/* Add new note */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardContent className="p-4 space-y-3">
                   {/* Note type selector */}
                   <div className="flex gap-2">
@@ -215,7 +215,7 @@ export function MeetingNotesPanel({
                     value={currentNote}
                     onChange={(e) => setCurrentNote(e.target.value)}
                     placeholder="Add a note... Use #tags to categorize"
-                    className="bg-gray-700 border-gray-600 text-white resize-none"
+                    className="bg-background border-input resize-none"
                     rows={3}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -225,7 +225,7 @@ export function MeetingNotesPanel({
                   />
 
                   <div className="flex justify-between items-center">
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-muted-foreground">
                       {currentNote.length > 0 && <span>Cmd+Enter to save</span>}
                     </div>
                     <Button
@@ -243,13 +243,13 @@ export function MeetingNotesPanel({
               {/* Search and filters */}
               <div className="space-y-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search notes..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
+                    className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-lg text-foreground text-sm"
                   />
                 </div>
 
@@ -286,7 +286,7 @@ export function MeetingNotesPanel({
                       key={note.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`bg-gray-800/30 border border-gray-700 rounded-lg p-3 border-l-2 ${getNoteTypeColor(note.type)}`}
+                      className={`bg-muted/30 border border-border rounded-lg p-3 border-l-2 ${getNoteTypeColor(note.type)}`}
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2">
@@ -300,12 +300,12 @@ export function MeetingNotesPanel({
                             <Tag className="w-4 h-4 text-yellow-500" />
                           )}
                           {getNoteTypeIcon(note.type) === 'FileText' && (
-                            <FileText className="w-4 h-4 text-gray-500" />
+                            <FileText className="w-4 h-4 text-muted-foreground" />
                           )}
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {formatTime(note.timestamp)}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-muted-foreground">
                             by {note.author}
                           </span>
                         </div>
@@ -320,7 +320,7 @@ export function MeetingNotesPanel({
                             {note.isStarred ? (
                               <Star className="w-3 h-3 text-yellow-500 fill-current" />
                             ) : (
-                              <StarOff className="w-3 h-3 text-gray-400" />
+                              <StarOff className="w-3 h-3 text-muted-foreground" />
                             )}
                           </Button>
 
@@ -330,7 +330,7 @@ export function MeetingNotesPanel({
                             onClick={() => setEditingNote(note.id)}
                             className="w-6 h-6 p-0"
                           >
-                            <Edit3 className="w-3 h-3 text-gray-400" />
+                            <Edit3 className="w-3 h-3 text-muted-foreground" />
                           </Button>
 
                           <Button
@@ -348,7 +348,7 @@ export function MeetingNotesPanel({
                         <div className="space-y-2">
                           <Textarea
                             defaultValue={note.content}
-                            className="bg-gray-700 border-gray-600 text-white text-sm"
+                            className="bg-background border-input text-sm"
                             rows={2}
                             onKeyDown={(e) => {
                               if (
@@ -377,7 +377,7 @@ export function MeetingNotesPanel({
                           </div>
                         </div>
                       ) : (
-                        <p className="text-white text-sm mb-2">
+                        <p className="text-foreground text-sm mb-2">
                           {note.content}
                         </p>
                       )}
@@ -399,7 +399,7 @@ export function MeetingNotesPanel({
                   ))}
 
                   {filteredNotes.length === 0 && (
-                    <div className="text-center py-8 text-gray-400">
+                    <div className="text-center py-8 text-muted-foreground">
                       {searchQuery || selectedTags.length > 0 ? (
                         <p>No notes match your filters</p>
                       ) : (
@@ -413,13 +413,13 @@ export function MeetingNotesPanel({
 
             <TabsContent value="actions" className="space-y-4 mt-4">
               {/* Add new action item */}
-              <Card className="bg-gray-800/50 border-gray-700">
+              <Card className="bg-muted/50 border-border">
                 <CardContent className="p-4 space-y-3">
                   <Textarea
                     value={newActionItem}
                     onChange={(e) => setNewActionItem(e.target.value)}
                     placeholder="Add an action item..."
-                    className="bg-gray-700 border-gray-600 text-white resize-none"
+                    className="bg-background border-input resize-none"
                     rows={2}
                   />
 
@@ -427,7 +427,7 @@ export function MeetingNotesPanel({
                     <select
                       value={selectedAssignee}
                       onChange={(e) => setSelectedAssignee(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white text-sm"
+                      className="flex-1 px-3 py-2 bg-background border border-input rounded-md text-foreground text-sm"
                     >
                       <option value="">Select assignee</option>
                       {meetingInfo.participants.map((participant) => (
@@ -457,7 +457,7 @@ export function MeetingNotesPanel({
                       key={action.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`bg-gray-800/30 border border-gray-700 rounded-lg p-3 ${
+                      className={`bg-muted/30 border border-border rounded-lg p-3 ${
                         action.isCompleted ? 'opacity-60' : ''
                       }`}
                     >
@@ -471,20 +471,20 @@ export function MeetingNotesPanel({
                           {action.isCompleted ? (
                             <CheckSquare className="w-4 h-4 text-green-500" />
                           ) : (
-                            <Square className="w-4 h-4 text-gray-400" />
+                            <Square className="w-4 h-4 text-muted-foreground" />
                           )}
                         </Button>
 
                         <div className="flex-1">
                           <p
-                            className={`text-white text-sm mb-2 ${
+                            className={`text-foreground text-sm mb-2 ${
                               action.isCompleted ? 'line-through' : ''
                             }`}
                           >
                             {action.task}
                           </p>
 
-                          <div className="flex items-center gap-4 text-xs text-gray-400">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <User className="w-3 h-3" />
                               <span>{action.assignee}</span>
@@ -506,7 +506,7 @@ export function MeetingNotesPanel({
                   ))}
 
                   {actionItems.length === 0 && (
-                    <div className="text-center py-8 text-gray-400">
+                    <div className="text-center py-8 text-muted-foreground">
                       <p>No action items yet</p>
                     </div>
                   )}
@@ -516,12 +516,12 @@ export function MeetingNotesPanel({
           </Tabs>
 
           {/* Export/Share actions */}
-          <div className="flex gap-2 mt-4 pt-4 border-t border-gray-700">
+          <div className="flex gap-2 mt-4 pt-4 border-t border-border">
             <Button
               variant="outline"
               size="sm"
               onClick={handleExportNotes}
-              className="flex-1 border-gray-600 text-white hover:bg-gray-800"
+              className="flex-1 border-border text-foreground hover:bg-muted"
             >
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -530,7 +530,7 @@ export function MeetingNotesPanel({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 border-gray-600 text-white hover:bg-gray-800"
+              className="flex-1 border-border text-foreground hover:bg-muted"
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share

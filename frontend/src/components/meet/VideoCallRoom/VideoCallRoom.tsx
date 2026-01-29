@@ -25,6 +25,7 @@ import { useVideoCallRoom } from './hooks/useVideoCallRoom';
 import { MeetingInfo, NotesMeetingInfo } from './types';
 import socket from '@/lib/sockets/socket';
 import { MeetNotification } from '../MeetNotification';
+import { ThemeToggle } from '@/components/theme';
 
 export function VideoCallRoom() {
   const [isShareLinkOpen, setIsShareLinkOpen] = useState(false);
@@ -126,16 +127,14 @@ export function VideoCallRoom() {
 
   if (joiningCall) {
     return (
-      <div>
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-          <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="w-16 h-16 border-4 border-primary border-dashed rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col overflow-hidden">
+    <div className="h-screen bg-background text-foreground flex flex-col overflow-hidden">
       {/* Top bar */}
       <TopBar
         callDuration={callDuration}
@@ -153,6 +152,7 @@ export function VideoCallRoom() {
         isFullscreen={isFullscreen}
         setIsFullscreen={setIsFullscreen}
         onShareClick={() => setIsShareLinkOpen(true)}
+        themeToggle={<ThemeToggle />}
       />
 
       {/* Main video area */}
@@ -185,6 +185,7 @@ export function VideoCallRoom() {
             onTogglePictureInPicture={handleTogglePictureInPicture}
             onToggleAdvancedAudio={toggleAdvancedAudio}
             unreadMessages={unreadMessages}
+            participantCount={activeParticipants.length}
             isHandRaised={isHandRaised}
             isRecording={isRecording}
             isAudioOn={isAudioOn}

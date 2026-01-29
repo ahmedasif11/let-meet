@@ -40,13 +40,13 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <Card className="bg-gray-800/50 border-gray-700">
+      <Card className="bg-muted/50 border-border">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
             Device & Connection Test
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription>
             Testing your devices and network connection for optimal call quality
           </CardDescription>
         </CardHeader>
@@ -57,11 +57,11 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Start Device Test
               </Button>
-              <div className="bg-blue-600/20 border border-blue-600/50 rounded-lg p-3">
+              <div className="bg-primary/10 border border-primary/30 rounded-lg p-3">
                 <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-blue-300">
-                    <p className="font-medium mb-1">What this test does:</p>
+                  <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground mb-1">What this test does:</p>
                     <ul className="space-y-1 text-xs">
                       <li>• Tests camera functionality and video quality</li>
                       <li>• Verifies microphone audio input</li>
@@ -75,10 +75,10 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
           )}
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-3">
-                <Camera className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Camera</span>
+                <Camera className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium">Camera</span>
               </div>
               <div className="flex items-center gap-2">
                 {getStatusIcon(testResults.camera)}
@@ -95,7 +95,7 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
                           : 'Error'}
                   </span>
                   {testResults.camera === 'error' && (
-                    <span className="text-xs text-red-400 mt-1">
+                    <span className="text-xs text-destructive mt-1">
                       Camera access failed
                     </span>
                   )}
@@ -103,10 +103,10 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-3">
-                <Mic className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Microphone</span>
+                <Mic className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium">Microphone</span>
               </div>
               <div className="flex items-center gap-2">
                 {getStatusIcon(testResults.microphone)}
@@ -123,7 +123,7 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
                           : 'Error'}
                   </span>
                   {testResults.microphone === 'error' && (
-                    <span className="text-xs text-red-400 mt-1">
+                    <span className="text-xs text-destructive mt-1">
                       Microphone access failed
                     </span>
                   )}
@@ -131,10 +131,10 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-3">
-                <Volume2 className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Speaker</span>
+                <Volume2 className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium">Speaker</span>
               </div>
               <div className="flex items-center gap-2">
                 {getStatusIcon(testResults.speaker)}
@@ -149,7 +149,7 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
                         : 'Error'}
                   </span>
                   {testResults.speaker === 'error' && (
-                    <span className="text-xs text-red-400 mt-1">
+                    <span className="text-xs text-destructive mt-1">
                       Speaker test failed
                     </span>
                   )}
@@ -157,10 +157,10 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-3">
-                <Monitor className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Network Connection</span>
+                <Monitor className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium">Network Connection</span>
               </div>
               <div className="flex items-center gap-2">
                 {getStatusIcon(testResults.network)}
@@ -177,7 +177,7 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
                           : 'Poor'}
                   </span>
                   {testResults.network === 'error' && (
-                    <span className="text-xs text-red-400 mt-1">
+                    <span className="text-xs text-destructive mt-1">
                       Network connection failed
                     </span>
                   )}
@@ -188,12 +188,12 @@ export const Step2DeviceTesting: React.FC<Step2DeviceTestingProps> = ({
 
           {allTestsComplete(testResults) && (
             <div className="space-y-3">
-              <div className="bg-green-600/20 border border-green-600/50 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-green-400 mb-2">
+              <div className="bg-green-600/10 dark:bg-green-600/20 border border-green-600/40 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
                   <CheckCircle className="w-5 h-5" />
                   <span>Device testing completed!</span>
                 </div>
-                <p className="text-gray-300 text-sm">
+                <p className="text-muted-foreground text-sm">
                   Your devices and connection are ready for a high-quality call.
                 </p>
               </div>

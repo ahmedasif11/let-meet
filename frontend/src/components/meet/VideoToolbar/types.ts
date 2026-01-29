@@ -13,6 +13,7 @@ export interface VideoToolbarProps {
   onToggleVideo?: () => void;
   onToggleScreenShare?: () => void;
   unreadMessages?: number;
+  participantCount?: number;
   isHandRaised?: boolean;
   isRecording?: boolean;
   isAudioOn?: boolean;

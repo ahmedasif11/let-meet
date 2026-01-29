@@ -63,18 +63,16 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
       exit={{ opacity: 0 }}
       className="space-y-6 w-full max-w-full min-w-0 overflow-x-hidden"
     >
-      {/* Microphone Settings */}
-      <Card className="bg-gray-800/50 border-gray-700 w-full">
+      <Card className="bg-muted/50 border-border w-full">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2">
             <Mic className="w-5 h-5" />
             Microphone Settings
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 w-full min-w-0">
-          {/* Microphone Device Select */}
           <div>
-            <Label className="text-white mb-2 block">Microphone Device</Label>
+            <Label className="mb-2 block">Microphone Device</Label>
             <Select
               value={settings.microphone.deviceId}
               onValueChange={(value: string) =>
@@ -87,7 +85,7 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
                 }))
               }
             >
-              <SelectTrigger className="bg-gray-700 border-gray-600 w-full overflow-hidden">
+              <SelectTrigger className="w-full overflow-hidden">
                 <SelectValue className="truncate" />
               </SelectTrigger>
               <SelectContent className="w-full">
@@ -100,9 +98,8 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
             </Select>
           </div>
 
-          {/* Microphone Volume Slider */}
           <div>
-            <Label className="text-white mb-2 block">
+            <Label className="mb-2 block">
               Input Volume: {settings.microphone.volume}%
             </Label>
             <Slider
@@ -119,32 +116,29 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
             />
           </div>
 
-          {/* Microphone Test Visual */}
-          <div className="bg-gray-700/50 p-4 rounded-lg">
+          <div className="bg-muted/50 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Mic className="w-4 h-4 text-green-400" />
-              <span className="text-white text-sm">Microphone Test</span>
+              <Mic className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-medium">Microphone Test</span>
             </div>
             <Progress value={audioLevel} className="w-full h-3" />
-            <p className="text-gray-400 text-xs mt-1">
+            <p className="text-muted-foreground text-xs mt-1">
               Speak to test your microphone
             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Speaker Settings */}
-      <Card className="bg-gray-800/50 border-gray-700 w-full">
+      <Card className="bg-muted/50 border-border w-full">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2">
             <Volume2 className="w-5 h-5" />
             Speaker Settings
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 w-full min-w-0">
-          {/* Speaker Device Select */}
           <div>
-            <Label className="text-white mb-2 block">Speaker Device</Label>
+            <Label className="mb-2 block">Speaker Device</Label>
             <Select
               value={settings.speaker.deviceId}
               onValueChange={(value: string) =>
@@ -154,7 +148,7 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
                 }))
               }
             >
-              <SelectTrigger className="bg-gray-700 border-gray-600 w-full overflow-hidden">
+              <SelectTrigger className="w-full overflow-hidden">
                 <SelectValue className="truncate" />
               </SelectTrigger>
               <SelectContent className="w-full">
@@ -167,9 +161,8 @@ export const Step1AudioSettings: React.FC<Step1AudioSettingsProps> = ({
             </Select>
           </div>
 
-          {/* Speaker Volume Slider */}
           <div>
-            <Label className="text-white mb-2 block">
+            <Label className="mb-2 block">
               Output Volume: {settings.speaker.volume}%
             </Label>
             <Slider

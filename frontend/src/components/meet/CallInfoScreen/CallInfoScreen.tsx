@@ -60,7 +60,7 @@ export function CallInfoScreen({
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-background flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">

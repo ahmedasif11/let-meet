@@ -47,50 +47,51 @@ export function ParticipantsPanel({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ x: '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className={`fixed right-0 top-0 h-full w-80 bg-gray-900/95 backdrop-blur-xl border-l border-white/10 z-50 flex flex-col ${className}`}
-        >
-          {/* Panel header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            onClick={onClose}
+            aria-hidden
+          />
+          <motion.div
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className={`fixed right-0 top-0 h-full w-full sm:w-80 max-w-full bg-card backdrop-blur-xl border-l border-border z-50 flex flex-col shadow-xl ${className}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <div>
-              <h3 className="text-white">Participants</h3>
-              <p className="text-sm text-gray-400">
-                {participants.length} in call
-              </p>
+              <h3 className="text-foreground font-semibold">Participants</h3>
+              <p className="text-sm text-muted-foreground">{participants.length} in call</p>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="text-gray-400 hover:text-white rounded-full"
-            >
+            <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
               <X className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* Search and invite */}
           <div className="p-4 space-y-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search participants..."
-                className="pl-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                className="pl-10"
               />
             </div>
 
-            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button className="w-full">
               <UserPlus className="w-4 h-4 mr-2" />
               Invite others
             </Button>
           </div>
 
-          <Separator className="bg-white/10" />
+          <Separator />
 
           {/* Participants list */}
           <ScrollArea className="flex-1">
@@ -99,7 +100,7 @@ export function ParticipantsPanel({
                 <motion.div
                   key={participant.id}
                   layout
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800/50 transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
                 >
                   {/* Avatar and status */}
                   <div className="relative">
@@ -114,7 +115,7 @@ export function ParticipantsPanel({
 
                     {/* Connection quality indicator */}
                     <div
-                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-900 ${
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-background ${
                         participant.connectionQuality === 'good'
                           ? 'bg-green-500'
                           : participant.connectionQuality === 'poor'
@@ -127,7 +128,7 @@ export function ParticipantsPanel({
                   {/* Participant info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-white text-sm truncate">
+                      <span className="text-foreground text-sm font-medium truncate">
                         {participant.name}
                         {participant.isYou && ' (You)'}
                       </span>
@@ -172,7 +173,7 @@ export function ParticipantsPanel({
                       {participant.isSpeaking && (
                         <Badge
                           variant="secondary"
-                          className="text-xs bg-green-600 text-white"
+                          className="text-xs"
                         >
                           Speaking
                         </Badge>
@@ -193,7 +194,7 @@ export function ParticipantsPanel({
                               : participant.id
                           )
                         }
-                        className="h-8 w-8 text-gray-400 hover:text-white"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                       >
                         <MoreVertical className="w-4 h-4" />
                       </Button>
@@ -204,7 +205,7 @@ export function ParticipantsPanel({
                             initial={{ opacity: 0, scale: 0.8, y: -10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.8, y: -10 }}
-                            className="absolute right-4 mt-2 bg-gray-800 rounded-lg shadow-xl border border-white/10 py-2 z-10"
+                            className="absolute right-4 mt-2 bg-card rounded-lg shadow-xl border border-border py-2 z-10"
                           >
                             <Button
                               variant="ghost"
@@ -246,6 +247,7 @@ export function ParticipantsPanel({
             </div>
           </ScrollArea>
         </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
