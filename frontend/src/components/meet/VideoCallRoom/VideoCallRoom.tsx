@@ -207,7 +207,7 @@ export function VideoCallRoom() {
         onClose={() => setIsParticipantsOpen(false)}
         participants={activeParticipants}
         currentUserId="you"
-        isHost={true}
+        isHost={admin}
       />
 
       {/* Reactions overlay */}

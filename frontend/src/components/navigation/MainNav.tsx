@@ -13,7 +13,7 @@ export function MainNav() {
     { href: '/', label: 'Home', icon: Home },
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/teams', label: 'Teams', icon: Users },
-    { href: '/video-call', label: 'Video Call', icon: Phone },
+    { href: '/meet', label: 'Video Call', icon: Phone },
   ];
 
   return (

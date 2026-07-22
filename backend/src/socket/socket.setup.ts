@@ -100,7 +100,7 @@ export function setupSocketIO(io: Server) {
         }
 
         const participants = Object.values(connectedPeers)
-          .filter((peer: Peer) => peer.isConnected)
+          .filter((peer: Peer) => peer.isConnected && peer.room === roomId)
           .map((peer: Peer) => peer.participant);
 
         io.in(roomId).emit(

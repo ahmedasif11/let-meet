@@ -8,15 +8,42 @@ import generateOTP from '../utils/generateOTP';
 import verifyEmail from '../verification/verify-email';
 import { createVerificationToken } from '../utils/generateToken';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
 const OTP_EXPIRY_MINUTES = 5;
+const isDbConfigured = () =>
+  !!process.env.MONGODB_URI &&
+  process.env.MONGODB_URI !== 'your_mongodb_connection_string_here';
+
+const ensureDatabaseConnection = async (res: Response): Promise<boolean> => {
+  if (!isDbConfigured()) {
+    res.status(503).json({
+      success: false,
+      message: 'Database is not configured',
+    });
+    return false;
+  }
+
+  await connectToDB();
+  if (mongoose.connection.readyState !== 1) {
+    res.status(503).json({
+      success: false,
+      message: 'Database is unavailable',
+    });
+    return false;
+  }
+
+  return true;
+};
 
 // Signup route
 router.post('/signup', async (req: Request, res: Response) => {
   try {
-    await connectToDB();
+    if (!(await ensureDatabaseConnection(res))) {
+      return;
+    }
 
     const validation = signUpSchema.safeParse(req.body);
 
@@ -119,7 +146,9 @@ router.post('/signup', async (req: Request, res: Response) => {
 // Verify email route
 router.post('/verify-email', async (req: Request, res: Response) => {
   try {
-    await connectToDB();
+    if (!(await ensureDatabaseConnection(res))) {
+      return;
+    }
     const { token, otp } = req.body;
 
     // Validate required fields
@@ -194,7 +223,9 @@ router.post('/verify-email', async (req: Request, res: Response) => {
 // Login route (for NextAuth credentials provider)
 router.post('/login', async (req: Request, res: Response) => {
   try {
-    await connectToDB();
+    if (!(await ensureDatabaseConnection(res))) {
+      return;
+    }
 
     const validation = loginSchema.safeParse(req.body);
 
@@ -255,7 +286,9 @@ router.post('/login', async (req: Request, res: Response) => {
 // Resend OTP route
 router.post('/resend-otp', async (req: Request, res: Response) => {
   try {
-    await connectToDB();
+    if (!(await ensureDatabaseConnection(res))) {
+      return;
+    }
     const { token } = req.body;
 
     if (!token) {
@@ -269,17 +302,29 @@ router.post('/resend-otp', async (req: Request, res: Response) => {
       });
     }
 
-    const decoded = jwt.verify(token, secret);
-    const { userId } = decoded as { userId: string };
+    let decoded: { userId: string };
+    try {
+      decoded = jwt.verify(token, secret) as { userId: string };
+    } catch {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired token',
+      });
+    }
+    const { userId } = decoded;
 
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
     }
 
     if (user.isVerified) {
       return res.status(400).json({
-        error: 'Email already verified',
+        success: false,
+        message: 'Email already verified',
       });
     }
 
@@ -298,7 +343,8 @@ router.post('/resend-otp', async (req: Request, res: Response) => {
 
     if (!emailVerification.success) {
       return res.status(500).json({
-        error: emailVerification.message,
+        success: false,
+        message: emailVerification.message,
       });
     }
 
@@ -308,12 +354,14 @@ router.post('/resend-otp', async (req: Request, res: Response) => {
     await user.save();
 
     return res.status(200).json({
+      success: true,
       message: 'OTP resent successfully',
     });
   } catch (error) {
     console.error('Error resending OTP:', error);
     return res.status(500).json({
-      error: 'Failed to resend OTP',
+      success: false,
+      message: 'Failed to resend OTP',
     });
   }
 });
@@ -321,7 +369,9 @@ router.post('/resend-otp', async (req: Request, res: Response) => {
 // OAuth user creation/update route (for Google/GitHub OAuth)
 router.post('/oauth-user', async (req: Request, res: Response) => {
   try {
-    await connectToDB();
+    if (!(await ensureDatabaseConnection(res))) {
+      return;
+    }
 
     const { email, name, avatar, provider } = req.body;
 

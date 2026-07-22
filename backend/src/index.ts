@@ -55,6 +55,50 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
   : ['http://localhost:3000', 'http://localhost:3001'];
 
+const isAllowedOrigin = (origin: string): boolean => {
+  if (allowedOrigins.includes('*')) {
+    return true;
+  }
+
+  let originUrl: URL;
+  try {
+    originUrl = new URL(origin);
+  } catch {
+    return false;
+  }
+
+  return allowedOrigins.some((allowed) => {
+    if (allowed === origin) {
+      return true;
+    }
+
+    try {
+      const allowedUrl = new URL(allowed);
+      const allowedHost = allowedUrl.hostname;
+
+      if (allowedHost === '*') {
+        return true;
+      }
+
+      if (allowedHost.startsWith('*.')) {
+        const baseHost = allowedHost.slice(2);
+        return (
+          originUrl.protocol === allowedUrl.protocol &&
+          (originUrl.hostname === baseHost || originUrl.hostname.endsWith(`.${baseHost}`))
+        );
+      }
+
+      return (
+        originUrl.protocol === allowedUrl.protocol &&
+        originUrl.hostname === allowedUrl.hostname &&
+        originUrl.port === allowedUrl.port
+      );
+    } catch {
+      return false;
+    }
+  });
+};
+
 // Log allowed origins for debugging
 console.log('🔒 CORS Allowed Origins:', allowedOrigins);
 
@@ -64,32 +108,13 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      
-      // Check if origin matches any allowed origin (exact match or wildcard)
-      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
-        // For ngrok and production, also check if origin contains the domain
-        const isAllowed = allowedOrigins.some(allowed => {
-          try {
-            const allowedUrl = new URL(allowed);
-            const originUrl = new URL(origin);
-            // Allow if same hostname (for ngrok subdomains)
-            return originUrl.hostname.includes(allowedUrl.hostname.replace('*.', '')) ||
-                   allowedUrl.hostname === '*' ||
-                   originUrl.hostname.endsWith(allowedUrl.hostname.replace('*.', ''));
-          } catch {
-            return false;
-          }
-        });
-        
-        if (isAllowed) {
-          callback(null, true);
-        } else {
-          console.warn('⚠️  CORS blocked origin:', origin);
-          console.warn('⚠️  Allowed origins:', allowedOrigins);
-          callback(new Error('Not allowed by CORS'));
-        }
+        console.warn('⚠️  CORS blocked origin:', origin);
+        console.warn('⚠️  Allowed origins:', allowedOrigins);
+        callback(new Error('Not allowed by CORS'));
       }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -123,31 +148,12 @@ const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      
-      // Check if origin matches any allowed origin (exact match or wildcard)
-      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
-        // For ngrok and production, also check if origin contains the domain
-        const isAllowed = allowedOrigins.some(allowed => {
-          try {
-            const allowedUrl = new URL(allowed);
-            const originUrl = new URL(origin);
-            // Allow if same hostname (for ngrok subdomains)
-            return originUrl.hostname.includes(allowedUrl.hostname.replace('*.', '')) ||
-                   allowedUrl.hostname === '*' ||
-                   originUrl.hostname.endsWith(allowedUrl.hostname.replace('*.', ''));
-          } catch {
-            return false;
-          }
-        });
-        
-        if (isAllowed) {
-          callback(null, true);
-        } else {
-          console.warn('⚠️  Socket.IO CORS blocked origin:', origin);
-          callback(new Error('Not allowed by CORS'));
-        }
+        console.warn('⚠️  Socket.IO CORS blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
       }
     },
     methods: ['GET', 'POST'],

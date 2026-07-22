@@ -87,7 +87,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 );
               })()}
               <span className={getConnectionColor(connectionStatus)}>
-                connected
+                {getConnectionStatusText(connectionStatus)}
               </span>
             </div>
           </div>
